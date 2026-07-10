@@ -1,104 +1,78 @@
-const K={siswa:"dataSiswaKelas5",absensi:"absensiKelas5",jurnal:"jurnalKelas5",catatan:"catatanKelas5",nilai:"nilaiKelas5",setting:"settingKelas5",mapel:"mapelKelas5",tabungan:"tabunganKelas5"};
-let siswa=baca(K.siswa,[]),absensi=baca(K.absensi,{}),jurnal=baca(K.jurnal,[]),catatan=baca(K.catatan,[]),nilai=baca(K.nilai,[]),mapel=baca(K.mapel,["Bahasa Indonesia","Matematika","IPAS","Pendidikan Pancasila"]),tabungan=baca(K.tabungan,[]),setting=baca(K.setting,{wali:"Wali Kelas 5",kelas:"Kelas 5",sekolah:"",tahun:"2026/2027"}),editIndex=null;
-const $=id=>document.getElementById(id), hariIni=()=>new Date().toISOString().slice(0,10);
-function baca(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
-function tulis(k,v){localStorage.setItem(k,JSON.stringify(v))}
+const K={siswa:"dataSiswaKelas5",absensi:"absensiKelas5",tabungan:"tabunganKelas5",mapel:"mapelKelas5",nilai:"nilaiKelas5",jurnal:"jurnalKelas5",catatan:"catatanKelas5",setting:"settingKelas5"};
+const $=id=>document.getElementById(id),today=()=>new Date().toISOString().slice(0,10),read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+let siswa=read(K.siswa,[]),absensi=read(K.absensi,{}),tabungan=read(K.tabungan,[]),mapel=read(K.mapel,["Bahasa Indonesia","Matematika","IPAS","Pendidikan Pancasila"]),nilai=read(K.nilai,[]),jurnal=read(K.jurnal,[]),catatan=read(K.catatan,[]),setting=read(K.setting,{wali:"Wali Kelas 5",kelas:"Kelas 5",sekolah:"",tahun:"2026/2027"}),editIndex=null;
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])),rp=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n||0);
 function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2200)}
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-
-const menuItems=document.querySelectorAll(".menu a[data-page]");
-menuItems.forEach(m=>m.onclick=()=>bukaHalaman(m.dataset.page));
-function bukaHalaman(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  $(id).classList.add("active");
-  menuItems.forEach(m=>m.classList.toggle("active",m.dataset.page===id));
-  $("sidebar").classList.remove("open");
-  if(id==="siswa")tampilkanSiswa();
-  if(id==="absensi")tampilkanAbsensi();
-  if(id==="rekap")tampilkanRekap();
-  if(id==="jurnal")tampilkanJurnal();
-  if(id==="catatan")tampilkanCatatan();
-  if(id==="nilai")tampilkanNilai();
-  if(id==="mapel")tampilkanMapel();
-  if(id==="tabungan")tampilkanTabungan();
-}
+document.querySelectorAll(".menu a").forEach(a=>a.onclick=()=>bukaHalaman(a.dataset.page));
 $("mobileToggle").onclick=()=>$("sidebar").classList.toggle("open");
+function bukaHalaman(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll(".menu a").forEach(a=>a.classList.toggle("active",a.dataset.page===id));$("sidebar").classList.remove("open");if(id==="siswa")renderSiswa();if(id==="absensi")renderAbsensi();if(id==="rekap")tampilkanRekap();if(id==="tabungan")tampilkanTabungan();if(id==="mapel")renderMapel();if(id==="nilai")renderNilai();if(id==="jurnal")renderJurnal();if(id==="catatan")renderCatatan()}
+function fokusTabungan(){setTimeout(()=>$("tabSiswa").focus(),100)}
+function optionsSiswa(semua=false){return (semua?'<option value="">Semua / Pilih siswa</option>':'<option value="">Pilih siswa</option>')+siswa.map(s=>`<option value="${s.absen}">${s.absen}. ${esc(s.nama)}</option>`).join("")}
+function optionsMapel(semua=false){return (semua?'<option value="">Semua / Pilih mapel</option>':'<option value="">Pilih mapel</option>')+mapel.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}
+function refreshOptions(){$("tabSiswa").innerHTML=optionsSiswa();$("nilaiSiswa").innerHTML=optionsSiswa();$("catatanSiswa").innerHTML=optionsSiswa();$("rekapNilaiSiswa").innerHTML=optionsSiswa(true);$("nilaiMapel").innerHTML=optionsMapel();$("jurnalMapel").innerHTML=optionsMapel();$("rekapNilaiMapel").innerHTML=optionsMapel(true)}
+function bukaTambah(){editIndex=null;$("judulModal").textContent="Tambah Siswa";$("formSiswa").reset();$("modalSiswa").classList.add("active")}function tutupModal(){$("modalSiswa").classList.remove("active")}
+$("formSiswa").onsubmit=e=>{e.preventDefault();const d={nama:$("nama").value.trim(),jk:$("jk").value,absen:Number($("absen").value),kode:$("kodeKartu").value.trim()||`KLS5-${String($("absen").value).padStart(3,"0")}`};if(siswa.some((x,i)=>x.absen===d.absen&&i!==editIndex))return alert("Nomor absen sudah dipakai.");editIndex===null?siswa.push(d):siswa[editIndex]=d;siswa.sort((a,b)=>a.absen-b.absen);write(K.siswa,siswa);tutupModal();renderSiswa();refreshOptions();dashboard();toast("Data siswa tersimpan")};
+$("cariSiswa").oninput=renderSiswa;
+function renderSiswa(){const q=$("cariSiswa").value.toLowerCase(),d=siswa.filter(s=>s.nama.toLowerCase().includes(q));$("tabelSiswa").innerHTML=d.length?d.map(s=>{const i=siswa.indexOf(s);return `<tr><td>${s.absen}</td><td><b>${esc(s.nama)}</b></td><td>${esc(s.jk)}</td><td>${esc(s.kode||`KLS5-${String(s.absen).padStart(3,"0")}`)}</td><td><button class="btn secondary small" onclick="editSiswa(${i})">✏️</button> <button class="btn danger small" onclick="hapusSiswa(${i})">🗑️</button></td></tr>`}).join(""):`<tr><td colspan="5">Belum ada siswa</td></tr>`;$("jumlahHeader").textContent=`${siswa.length} Siswa`}
+function editSiswa(i){editIndex=i;const s=siswa[i];$("judulModal").textContent="Edit Siswa";$("nama").value=s.nama;$("jk").value=s.jk;$("absen").value=s.absen;$("kodeKartu").value=s.kode||"";$("modalSiswa").classList.add("active")}
+function hapusSiswa(i){if(confirm(`Hapus ${siswa[i].nama}?`)){siswa.splice(i,1);write(K.siswa,siswa);renderSiswa();refreshOptions();dashboard()}}
 
-function bukaTambah(){editIndex=null;$("judulModal").textContent="Tambah Siswa";$("formSiswa").reset();$("modalSiswa").classList.add("active")}
-function tutupModal(){$("modalSiswa").classList.remove("active")}
-$("modalSiswa").onclick=e=>{if(e.target===$("modalSiswa"))tutupModal()};
-$("formSiswa").onsubmit=e=>{
-  e.preventDefault();
-  const data={nama:$("nama").value.trim(),jk:$("jk").value,absen:Number($("absen").value)};
-  if(!data.nama)return;
-  const bentrok=siswa.some((x,i)=>x.absen===data.absen&&i!==editIndex);
-  if(bentrok)return alert("Nomor absen sudah dipakai.");
-  editIndex===null?siswa.push(data):siswa[editIndex]=data;
-  siswa.sort((a,b)=>a.absen-b.absen);tulis(K.siswa,siswa);tutupModal();tampilkanSiswa();isiPilihanSiswa();updateDashboard();toast("Data siswa tersimpan");
-};
-$("cariSiswa").oninput=tampilkanSiswa;
-function tampilkanSiswa(){
-  const kata=$("cariSiswa").value.toLowerCase(),hasil=siswa.filter(x=>x.nama.toLowerCase().includes(kata));
-  $("tabelSiswa").innerHTML=hasil.length?hasil.map(x=>{const i=siswa.indexOf(x);return `<tr><td>${x.absen}</td><td><strong>${esc(x.nama)}</strong></td><td>${esc(x.jk)}</td><td>${x.absen}</td><td><button class="btn btn-secondary btn-small" onclick="editSiswa(${i})">✏️ Edit</button> <button class="btn btn-danger btn-small" onclick="hapusSiswa(${i})">🗑️ Hapus</button></td></tr>`}).join(""):`<tr><td colspan="5" class="empty">Belum ada data siswa</td></tr>`;
-  updateJumlah();
-}
-function editSiswa(i){editIndex=i;$("judulModal").textContent="Edit Siswa";$("nama").value=siswa[i].nama;$("jk").value=siswa[i].jk;$("absen").value=siswa[i].absen;$("modalSiswa").classList.add("active")}
-function hapusSiswa(i){if(confirm(`Hapus data ${siswa[i].nama}?`)){siswa.splice(i,1);tulis(K.siswa,siswa);tampilkanSiswa();isiPilihanSiswa();updateDashboard()}}
-function updateJumlah(){$("jumlahSiswa").textContent=siswa.length;$("jumlahHeader").textContent=`${siswa.length} Siswa`}
+$("tanggalAbsensi").value=today();$("tanggalAbsensi").onchange=renderAbsensi;
+function renderAbsensi(){const t=$("tanggalAbsensi").value||today(),d=absensi[t]||{};$("tanggalHariIni").textContent=new Date(t+"T00:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});$("tabelAbsensi").innerHTML=siswa.map(s=>`<tr><td>${s.absen}</td><td><b>${esc(s.nama)}</b></td><td><select class="status" data-absen="${s.absen}">${["Hadir","Sakit","Izin","Alpa"].map(v=>`<option ${(d[s.absen]||"Hadir")===v?"selected":""}>${v}</option>`).join("")}</select></td></tr>`).join("")}
+function hadirSemua(){document.querySelectorAll(".status").forEach(x=>x.value="Hadir")}
+function simpanAbsensi(){const t=$("tanggalAbsensi").value,d={};document.querySelectorAll(".status").forEach(x=>d[x.dataset.absen]=x.value);absensi[t]=d;write(K.absensi,absensi);dashboard();toast("Absensi tersimpan")}
+$("bulanRekap").value=today().slice(0,7);
+function tampilkanRekap(){const b=$("bulanRekap").value;$("tabelRekap").innerHTML=siswa.map(s=>{let r={Hadir:0,Sakit:0,Izin:0,Alpa:0};Object.entries(absensi).filter(([t])=>t.startsWith(b)).forEach(([,d])=>{if(r[d[s.absen]]!==undefined)r[d[s.absen]]++});return `<tr><td>${s.absen}</td><td><b>${esc(s.nama)}</b></td><td>${r.Hadir}</td><td>${r.Sakit}</td><td>${r.Izin}</td><td>${r.Alpa}</td><td>${Object.values(r).reduce((a,c)=>a+c,0)}</td></tr>`}).join("")}
+function prosesKodeAbsensi(){const k=$("kodeScan").value.trim(),s=siswa.find(x=>(x.kode||`KLS5-${String(x.absen).padStart(3,"0")}`)===k);if(!s){$("hasilScan").textContent="❌ Kode tidak ditemukan";return}absensi[today()]=absensi[today()]||{};if(absensi[today()][s.absen]==="Hadir"){$("hasilScan").textContent=`⚠️ ${s.nama} sudah hadir`;return}absensi[today()][s.absen]="Hadir";write(K.absensi,absensi);$("hasilScan").textContent=`✅ ${s.nama} berhasil hadir`;$("kodeScan").value="";dashboard()}
 
-$("tanggalAbsensi").value=hariIni();$("tanggalAbsensi").onchange=tampilkanAbsensi;
-function tampilkanAbsensi(){
-  const t=$("tanggalAbsensi").value||hariIni();$("tanggalHariIni").textContent=new Date(t+"T00:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"});
-  const data=absensi[t]||{};
-  $("tabelAbsensi").innerHTML=siswa.length?siswa.map(x=>`<tr><td>${x.absen}</td><td><strong>${esc(x.nama)}</strong></td><td><select class="status-absensi" data-absen="${x.absen}">${["Hadir","Sakit","Izin","Alpa"].map(v=>`<option value="${v}" ${(data[x.absen]||"Hadir")===v?"selected":""}>${{Hadir:"✅",Sakit:"🤒",Izin:"📄",Alpa:"❌"}[v]} ${v}</option>`).join("")}</select></td></tr>`).join(""):`<tr><td colspan="3" class="empty">Belum ada data siswa</td></tr>`;
-}
-function hadirSemua(){document.querySelectorAll(".status-absensi").forEach(s=>s.value="Hadir")}
-function simpanAbsensi(){
-  const t=$("tanggalAbsensi").value;if(!t)return alert("Pilih tanggal.");
-  const data={};document.querySelectorAll(".status-absensi").forEach(s=>data[s.dataset.absen]=s.value);
-  absensi[t]=data;tulis(K.absensi,absensi);updateDashboard();toast("Absensi tersimpan");
-}
+$("tabTanggal").value=today();$("bulanTabungan").value=today().slice(0,7);
+$("formTabungan").onsubmit=e=>{e.preventDefault();tabungan.unshift({tanggal:$("tabTanggal").value,absen:Number($("tabSiswa").value),nominal:Number($("tabNominal").value),ket:$("tabKet").value.trim()});write(K.tabungan,tabungan);e.target.reset();$("tabTanggal").value=today();refreshOptions();tampilkanTabungan();dashboard();toast("Setoran tersimpan")};
+function tampilkanTabungan(){const b=$("bulanTabungan").value,d=tabungan.filter(x=>x.tanggal.startsWith(b));$("tabelTabungan").innerHTML=d.length?d.map(x=>{const i=tabungan.indexOf(x),s=siswa.find(a=>a.absen===x.absen);return `<tr><td>${x.tanggal}</td><td>${esc(s?.nama||"Siswa dihapus")}</td><td>${rp(x.nominal)}</td><td>${esc(x.ket)}</td><td><button class="btn danger small" onclick="hapusTab(${i})">🗑️</button></td></tr>`}).join(""):`<tr><td colspan="5">Belum ada setoran bulan ini</td></tr>`;$("rekapTabungan").innerHTML=siswa.map(s=>{const bm=d.filter(x=>x.absen===s.absen).reduce((a,c)=>a+c.nominal,0),tot=tabungan.filter(x=>x.absen===s.absen).reduce((a,c)=>a+c.nominal,0);return `<tr><td>${s.absen}</td><td><b>${esc(s.nama)}</b></td><td>${rp(bm)}</td><td>${rp(tot)}</td></tr>`}).join("");$("saldoKelas").textContent=rp(tabungan.reduce((a,c)=>a+c.nominal,0))}
+function hapusTab(i){if(confirm("Hapus setoran?")){tabungan.splice(i,1);write(K.tabungan,tabungan);tampilkanTabungan();dashboard()}}
 
-$("bulanRekap").value=hariIni().slice(0,7);
-function tampilkanRekap(){
-  const bln=$("bulanRekap").value||hariIni().slice(0,7);
-  $("tabelRekap").innerHTML=siswa.length?siswa.map(x=>{const r={Hadir:0,Sakit:0,Izin:0,Alpa:0};Object.entries(absensi).filter(([t])=>t.startsWith(bln)).forEach(([,d])=>{const s=d[x.absen];if(r[s]!==undefined)r[s]++});const total=Object.values(r).reduce((a,b)=>a+b,0);return `<tr><td>${x.absen}</td><td><strong>${esc(x.nama)}</strong></td><td>${r.Hadir}</td><td>${r.Sakit}</td><td>${r.Izin}</td><td>${r.Alpa}</td><td>${total}</td></tr>`}).join(""):`<tr><td colspan="7" class="empty">Belum ada data siswa</td></tr>`;
-}
+$("formMapel").onsubmit=e=>{e.preventDefault();const n=$("namaMapel").value.trim();if(n&&!mapel.some(x=>x.toLowerCase()===n.toLowerCase())){mapel.push(n);mapel.sort();write(K.mapel,mapel);renderMapel();refreshOptions();e.target.reset();toast("Mapel ditambahkan")}};
+function renderMapel(){$("tabelMapel").innerHTML=mapel.map((m,i)=>`<tr><td>${i+1}</td><td><b>${esc(m)}</b></td><td><button class="btn danger small" onclick="hapusMapel(${i})">🗑️</button></td></tr>`).join("")}
+function hapusMapel(i){if(confirm("Hapus mapel?")){mapel.splice(i,1);write(K.mapel,mapel);renderMapel();refreshOptions()}}
 
-$("jurnalTanggal").value=hariIni();
-$("formJurnal").onsubmit=e=>{e.preventDefault();jurnal.unshift({tanggal:$("jurnalTanggal").value,mapel:$("jurnalMapel").value.trim(),materi:$("jurnalMateri").value.trim()});tulis(K.jurnal,jurnal);e.target.reset();$("jurnalTanggal").value=hariIni();tampilkanJurnal();toast("Jurnal tersimpan")};
-function tampilkanJurnal(){$("tabelJurnal").innerHTML=jurnal.length?jurnal.map((x,i)=>`<tr><td>${x.tanggal}</td><td>${esc(x.mapel)}</td><td>${esc(x.materi)}</td><td><button class="btn btn-danger btn-small" onclick="hapusItem('jurnal',${i})">🗑️</button></td></tr>`).join(""):`<tr><td colspan="4" class="empty">Belum ada jurnal</td></tr>`}
+$("formNilai").onsubmit=e=>{e.preventDefault();nilai.unshift({semester:$("nilaiSemester").value,absen:Number($("nilaiSiswa").value),mapel:$("nilaiMapel").value,jenis:$("nilaiJenis").value,kegiatan:$("nilaiKegiatan").value.trim(),angka:Number($("nilaiAngka").value)});write(K.nilai,nilai);e.target.reset();refreshOptions();renderNilai();toast("Nilai tersimpan")};
+function renderNilai(){$("tabelNilai").innerHTML=nilai.length?nilai.map((n,i)=>{const s=siswa.find(x=>x.absen===n.absen);return `<tr><td>${n.semester||1}</td><td>${esc(s?.nama||"Siswa dihapus")}</td><td>${esc(n.mapel)}</td><td>${esc(n.jenis)}</td><td>${esc(n.kegiatan||"")}</td><td><b>${n.angka}</b></td><td><button class="btn danger small" onclick="hapusNilai(${i})">🗑️</button></td></tr>`}).join(""):`<tr><td colspan="7">Belum ada nilai</td></tr>`}
+function hapusNilai(i){if(confirm("Hapus nilai?")){nilai.splice(i,1);write(K.nilai,nilai);renderNilai()}}
+const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):"-";
+function kelompokJenis(d){const jenis=["Tugas / Formatif","Ulangan Harian / Sumatif Lingkup Materi","Tengah Semester","Akhir Semester"];return jenis.map(j=>avg(d.filter(x=>x.jenis===j).map(x=>x.angka)))}
+function rekapPerAnakMapel(){const a=Number($("rekapNilaiSiswa").value),m=$("rekapNilaiMapel").value,sem=$("rekapSemester").value;if(!a||!m)return alert("Pilih siswa dan mapel.");const d=nilai.filter(x=>x.absen===a&&x.mapel===m&&String(x.semester||1)===sem),s=siswa.find(x=>x.absen===a),r=kelompokJenis(d);$("judulRekapNilai").textContent=`${s?.nama||""} • ${m} • Semester ${sem}`;$("headRekapNilai").innerHTML="<tr><th>Formatif</th><th>UH/Sumatif</th><th>Tengah Semester</th><th>Akhir Semester</th><th>Rata-rata Semua Nilai</th></tr>";$("bodyRekapNilai").innerHTML=`<tr>${r.map(x=>`<td>${x}</td>`).join("")}<td><b>${avg(d.map(x=>x.angka))}</b></td></tr>`}
+function rekapPerMapel(){const m=$("rekapNilaiMapel").value,sem=$("rekapSemester").value;if(!m)return alert("Pilih mapel.");$("judulRekapNilai").textContent=`${m} • Semua Siswa • Semester ${sem}`;$("headRekapNilai").innerHTML="<tr><th>No.</th><th>Nama</th><th>Formatif</th><th>UH/Sumatif</th><th>Tengah</th><th>Akhir</th><th>Rata-rata</th></tr>";$("bodyRekapNilai").innerHTML=siswa.map(s=>{const d=nilai.filter(x=>x.absen===s.absen&&x.mapel===m&&String(x.semester||1)===sem),r=kelompokJenis(d);return `<tr><td>${s.absen}</td><td><b>${esc(s.nama)}</b></td>${r.map(x=>`<td>${x}</td>`).join("")}<td><b>${avg(d.map(x=>x.angka))}</b></td></tr>`}).join("")}
+function rekapSemuaMapelAnak(){const a=Number($("rekapNilaiSiswa").value),sem=$("rekapSemester").value;if(!a)return alert("Pilih siswa.");const s=siswa.find(x=>x.absen===a);$("judulRekapNilai").textContent=`${s?.nama||""} • Semua Mapel • Semester ${sem}`;$("headRekapNilai").innerHTML="<tr><th>Mapel</th><th>Formatif</th><th>UH/Sumatif</th><th>Tengah</th><th>Akhir</th><th>Rata-rata</th></tr>";$("bodyRekapNilai").innerHTML=mapel.map(m=>{const d=nilai.filter(x=>x.absen===a&&x.mapel===m&&String(x.semester||1)===sem),r=kelompokJenis(d);return `<tr><td><b>${esc(m)}</b></td>${r.map(x=>`<td>${x}</td>`).join("")}<td><b>${avg(d.map(x=>x.angka))}</b></td></tr>`}).join("")}
 
-$("catatanTanggal").value=hariIni();
-$("formCatatan").onsubmit=e=>{e.preventDefault();catatan.unshift({tanggal:$("catatanTanggal").value,absen:Number($("catatanSiswa").value),isi:$("isiCatatan").value.trim()});tulis(K.catatan,catatan);e.target.reset();$("catatanTanggal").value=hariIni();isiPilihanSiswa();tampilkanCatatan();toast("Catatan tersimpan")};
-function tampilkanCatatan(){$("tabelCatatan").innerHTML=catatan.length?catatan.map((x,i)=>{const s=siswa.find(a=>a.absen===x.absen);return `<tr><td>${x.tanggal}</td><td>${esc(s?.nama||"Siswa dihapus")}</td><td>${esc(x.isi)}</td><td><button class="btn btn-danger btn-small" onclick="hapusItem('catatan',${i})">🗑️</button></td></tr>`}).join(""):`<tr><td colspan="4" class="empty">Belum ada catatan</td></tr>`}
+$("jurnalTanggal").value=today();$("catatanTanggal").value=today();
+$("formJurnal").onsubmit=e=>{e.preventDefault();jurnal.unshift({tanggal:$("jurnalTanggal").value,mapel:$("jurnalMapel").value,materi:$("jurnalMateri").value.trim()});write(K.jurnal,jurnal);e.target.reset();$("jurnalTanggal").value=today();refreshOptions();renderJurnal();toast("Jurnal tersimpan")};
+function renderJurnal(){$("tabelJurnal").innerHTML=jurnal.map((x,i)=>`<tr><td>${x.tanggal}</td><td>${esc(x.mapel)}</td><td>${esc(x.materi)}</td><td><button class="btn danger small" onclick="hapusUmum('jurnal',${i})">🗑️</button></td></tr>`).join("")}
+$("formCatatan").onsubmit=e=>{e.preventDefault();catatan.unshift({tanggal:$("catatanTanggal").value,absen:Number($("catatanSiswa").value),isi:$("isiCatatan").value.trim()});write(K.catatan,catatan);e.target.reset();$("catatanTanggal").value=today();refreshOptions();renderCatatan();toast("Catatan tersimpan")};
+function renderCatatan(){$("tabelCatatan").innerHTML=catatan.map((x,i)=>`<tr><td>${x.tanggal}</td><td>${esc(siswa.find(s=>s.absen===x.absen)?.nama||"Siswa dihapus")}</td><td>${esc(x.isi)}</td><td><button class="btn danger small" onclick="hapusUmum('catatan',${i})">🗑️</button></td></tr>`).join("")}
+function hapusUmum(j,i){if(!confirm("Hapus data?"))return;if(j==="jurnal"){jurnal.splice(i,1);write(K.jurnal,jurnal);renderJurnal()}else{catatan.splice(i,1);write(K.catatan,catatan);renderCatatan()}}
 
-$("formNilai").onsubmit=e=>{e.preventDefault();nilai.unshift({absen:Number($("nilaiSiswa").value),mapel:$("nilaiMapel").value,jenis:$("nilaiJenis").value.trim(),angka:Number($("nilaiAngka").value)});tulis(K.nilai,nilai);e.target.reset();isiPilihanSiswa();tampilkanNilai();toast("Nilai tersimpan")};
-function tampilkanNilai(){$("tabelNilai").innerHTML=nilai.length?nilai.map((x,i)=>{const s=siswa.find(a=>a.absen===x.absen);return `<tr><td>${esc(s?.nama||"Siswa dihapus")}</td><td>${esc(x.mapel)}</td><td>${esc(x.jenis)}</td><td><strong>${x.angka}</strong></td><td><button class="btn btn-danger btn-small" onclick="hapusItem('nilai',${i})">🗑️</button></td></tr>`}).join(""):`<tr><td colspan="5" class="empty">Belum ada nilai</td></tr>`}
+function dashboard(){$("jumlahSiswa").textContent=siswa.length;const d=absensi[today()]||{},v=Object.values(d);$("hadirHariIni").textContent=v.filter(x=>x==="Hadir").length;$("izinHariIni").textContent=v.filter(x=>x==="Sakit"||x==="Izin").length;$("alpaHariIni").textContent=v.filter(x=>x==="Alpa").length;$("totalTabunganKelas").textContent=rp(tabungan.reduce((a,c)=>a+c.nominal,0));$("tabunganBulanIni").textContent=rp(tabungan.filter(x=>x.tanggal.startsWith(today().slice(0,7))).reduce((a,c)=>a+c.nominal,0));$("namaWaliHeader").textContent=setting.wali;$("subJudulDashboard").textContent=`${setting.sekolah?setting.sekolah+" • ":""}${setting.kelas} • ${setting.tahun}`}
+function loadSetting(){$("settingWali").value=setting.wali;$("settingKelas").value=setting.kelas;$("settingSekolah").value=setting.sekolah;$("settingTahun").value=setting.tahun}
+$("formPengaturan").onsubmit=e=>{e.preventDefault();setting={wali:$("settingWali").value.trim()||"Wali Kelas 5",kelas:$("settingKelas").value.trim()||"Kelas 5",sekolah:$("settingSekolah").value.trim(),tahun:$("settingTahun").value.trim()};write(K.setting,setting);dashboard();toast("Pengaturan tersimpan")};
 
-function isiPilihanMapel(){const opsi=`<option value="">Pilih mata pelajaran</option>`+mapel.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");$("nilaiMapel").innerHTML=opsi}
-function tampilkanMapel(){$("tabelMapel").innerHTML=mapel.length?mapel.map((x,i)=>`<tr><td>${i+1}</td><td><strong>${esc(x)}</strong></td><td><button class="btn btn-danger btn-small" onclick="hapusMapel(${i})">🗑️ Hapus</button></td></tr>`).join(""):`<tr><td colspan="3" class="empty">Belum ada mata pelajaran</td></tr>`}
-$("formMapel").onsubmit=e=>{e.preventDefault();const n=$("namaMapel").value.trim();if(n&&!mapel.some(x=>x.toLowerCase()===n.toLowerCase())){mapel.push(n);mapel.sort();tulis(K.mapel,mapel);tampilkanMapel();isiPilihanMapel();e.target.reset();toast("Mata pelajaran ditambahkan")}}
-function hapusMapel(i){if(confirm("Hapus mata pelajaran ini?")){mapel.splice(i,1);tulis(K.mapel,mapel);tampilkanMapel();isiPilihanMapel()}}
+function eksporExcel(){if(typeof XLSX==="undefined")return alert("Library Excel belum termuat. Pastikan internet aktif.");const wb=XLSX.utils.book_new(),add=(name,data)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data.length?data:[{}]),name);
+add("Data Siswa",siswa.map(s=>({No_Absen:s.absen,Nama:s.nama,Jenis_Kelamin:s.jk,Kode_Kartu:s.kode||""})));
+const a=[];Object.entries(absensi).forEach(([t,d])=>siswa.forEach(s=>a.push({Tanggal:t,No_Absen:s.absen,Nama:s.nama,Status:d[s.absen]||""})));add("Absensi",a);
+add("Tabungan",tabungan.map(x=>({Tanggal:x.tanggal,No_Absen:x.absen,Nama:siswa.find(s=>s.absen===x.absen)?.nama||"",Nominal:x.nominal,Keterangan:x.ket})));
+add("Rekap Tabungan",siswa.map(s=>({No_Absen:s.absen,Nama:s.nama,Total:tabungan.filter(x=>x.absen===s.absen).reduce((a,c)=>a+c.nominal,0)})));
+add("Data Mapel",mapel.map(m=>({Mata_Pelajaran:m})));
+add("Nilai",nilai.map(n=>({Semester:n.semester||1,No_Absen:n.absen,Nama:siswa.find(s=>s.absen===n.absen)?.nama||"",Mata_Pelajaran:n.mapel,Jenis_Penilaian:n.jenis,Kegiatan_TP:n.kegiatan||"",Nilai:n.angka})));
+add("Jurnal",jurnal.map(x=>({Tanggal:x.tanggal,Mata_Pelajaran:x.mapel,Materi_Kegiatan:x.materi})));
+add("Catatan Siswa",catatan.map(x=>({Tanggal:x.tanggal,No_Absen:x.absen,Nama:siswa.find(s=>s.absen===x.absen)?.nama||"",Catatan:x.isi})));
+XLSX.writeFile(wb,`Administrasi-Wali-Kelas-${today()}.xlsx`)}
+$("fileExcel").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const wb=XLSX.read(r.result,{type:"array"}),names=wb.SheetNames;$("previewImpor").innerHTML=`Sheet ditemukan: <b>${names.join(", ")}</b><br><button class="btn primary" onclick="konfirmasiImporExcel()">✅ Konfirmasi Impor</button>`;window._wbImpor=wb}catch{alert("File Excel tidak dapat dibaca.")}};r.readAsArrayBuffer(f)};
+function konfirmasiImporExcel(){const wb=window._wbImpor;if(!wb)return;if(!confirm("Impor akan mengganti data pada sheet yang dikenali. Lanjut?"))return;const rows=n=>wb.Sheets[n]?XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:""}):null;
+let d=rows("Data Siswa");if(d)siswa=d.filter(x=>x.Nama).map(x=>({absen:Number(x.No_Absen),nama:String(x.Nama),jk:String(x.Jenis_Kelamin),kode:String(x.Kode_Kartu||"")})),write(K.siswa,siswa);
+d=rows("Data Mapel");if(d)mapel=d.filter(x=>x.Mata_Pelajaran).map(x=>String(x.Mata_Pelajaran)),write(K.mapel,mapel);
+d=rows("Tabungan");if(d)tabungan=d.filter(x=>x.Tanggal&&x.No_Absen).map(x=>({tanggal:String(x.Tanggal).slice(0,10),absen:Number(x.No_Absen),nominal:Number(x.Nominal),ket:String(x.Keterangan||"")})),write(K.tabungan,tabungan);
+d=rows("Nilai");if(d)nilai=d.filter(x=>x.No_Absen&&x.Mata_Pelajaran).map(x=>({semester:String(x.Semester||1),absen:Number(x.No_Absen),mapel:String(x.Mata_Pelajaran),jenis:String(x.Jenis_Penilaian),kegiatan:String(x.Kegiatan_TP||""),angka:Number(x.Nilai)})),write(K.nilai,nilai);
+alert("Impor selesai. Aplikasi akan dimuat ulang.");location.reload()}
+function eksporJSON(){const blob=new Blob([JSON.stringify({siswa,absensi,tabungan,mapel,nilai,jurnal,catatan,setting},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`backup-wali-kelas-${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
+$("fileJSON").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!confirm("Ganti semua data dengan backup ini?"))return;Object.entries(K).forEach(([n,k])=>{if(d[n]!==undefined)write(k,d[n])});location.reload()}catch{alert("File JSON tidak valid.")}};r.readAsText(f)}
+function cetakBagian(id){bukaHalaman(id);document.querySelectorAll(".page").forEach(p=>p.classList.remove("printing"));$(id).classList.add("printing");setTimeout(()=>{window.print();$(id).classList.remove("printing")},120)}
 
-$("tabTanggal").value=hariIni();$("bulanTabungan").value=hariIni().slice(0,7);
-$("formTabungan").onsubmit=e=>{e.preventDefault();tabungan.unshift({tanggal:$("tabTanggal").value,absen:Number($("tabSiswa").value),nominal:Number($("tabNominal").value),ket:$("tabKet").value.trim()});tulis(K.tabungan,tabungan);e.target.reset();$("tabTanggal").value=hariIni();isiPilihanSiswa();tampilkanTabungan();updateDashboard();toast("Setoran tersimpan")}
-function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n||0)}
-function tampilkanTabungan(){const bln=$("bulanTabungan").value||hariIni().slice(0,7),data=tabungan.filter(x=>x.tanggal.startsWith(bln));$("tabelTabungan").innerHTML=data.length?data.map(x=>{const i=tabungan.indexOf(x),s=siswa.find(a=>a.absen===x.absen);return `<tr><td>${x.tanggal}</td><td>${esc(s?.nama||"Siswa dihapus")}</td><td>${rupiah(x.nominal)}</td><td>${esc(x.ket)}</td><td><button class="btn btn-danger btn-small" onclick="hapusTabungan(${i})">🗑️</button></td></tr>`}).join(""):`<tr><td colspan="5" class="empty">Belum ada setoran bulan ini</td></tr>`;$("rekapTabungan").innerHTML=siswa.map(s=>{const bulan=data.filter(x=>x.absen===s.absen).reduce((a,b)=>a+b.nominal,0),total=tabungan.filter(x=>x.absen===s.absen).reduce((a,b)=>a+b.nominal,0);return `<tr><td>${s.absen}</td><td><strong>${esc(s.nama)}</strong></td><td>${rupiah(bulan)}</td><td>${rupiah(total)}</td></tr>`}).join("");const total=tabungan.reduce((a,b)=>a+b.nominal,0);$("saldoKelas").textContent=rupiah(total)}
-function hapusTabungan(i){if(confirm("Hapus setoran ini?")){tabungan.splice(i,1);tulis(K.tabungan,tabungan);tampilkanTabungan();updateDashboard()}}
-
-function prosesKodeAbsensi(){const kode=$("kodeScan").value.trim();const no=Number(kode.replace(/\D/g,""));const s=siswa.find(x=>x.absen===no);if(!s){$("hasilScan").textContent="❌ Kode siswa tidak ditemukan";return}const t=hariIni();absensi[t]=absensi[t]||{};if(absensi[t][s.absen]==="Hadir"){$("hasilScan").textContent=`⚠️ ${s.nama} sudah tercatat hadir`;return}absensi[t][s.absen]="Hadir";tulis(K.absensi,absensi);$("hasilScan").textContent=`✅ ${s.nama} berhasil dicatat hadir`;updateDashboard();$("kodeScan").value=""}
-
-function isiPilihanSiswa(){const opsi=`<option value="">Pilih siswa</option>`+siswa.map(x=>`<option value="${x.absen}">${x.absen}. ${esc(x.nama)}</option>`).join("");$("catatanSiswa").innerHTML=opsi;$("nilaiSiswa").innerHTML=opsi;$("tabSiswa").innerHTML=opsi}
-function hapusItem(jenis,i){if(!confirm("Hapus data ini?"))return;if(jenis==="jurnal"){jurnal.splice(i,1);tulis(K.jurnal,jurnal);tampilkanJurnal()}if(jenis==="catatan"){catatan.splice(i,1);tulis(K.catatan,catatan);tampilkanCatatan()}if(jenis==="nilai"){nilai.splice(i,1);tulis(K.nilai,nilai);tampilkanNilai()}}
-
-function muatPengaturan(){$("settingWali").value=setting.wali;$("settingKelas").value=setting.kelas;$("settingSekolah").value=setting.sekolah;$("settingTahun").value=setting.tahun;terapkanPengaturan()}
-$("formPengaturan").onsubmit=e=>{e.preventDefault();setting={wali:$("settingWali").value.trim()||"Wali Kelas 5",kelas:$("settingKelas").value.trim()||"Kelas 5",sekolah:$("settingSekolah").value.trim(),tahun:$("settingTahun").value.trim()};tulis(K.setting,setting);terapkanPengaturan();toast("Pengaturan tersimpan")};
-function terapkanPengaturan(){$("namaWaliHeader").textContent=setting.wali;$("subJudulDashboard").textContent=`${setting.sekolah?setting.sekolah+" • ":""}${setting.kelas} • ${setting.tahun}`}
-
-function updateDashboard(){updateJumlah();const d=absensi[hariIni()]||{},v=Object.values(d);$("hadirHariIni").textContent=v.filter(x=>x==="Hadir").length;$("izinHariIni").textContent=v.filter(x=>x==="Sakit"||x==="Izin").length;$("alpaHariIni").textContent=v.filter(x=>x==="Alpa").length;const total=tabungan.reduce((a,b)=>a+b.nominal,0),bln=hariIni().slice(0,7),bulan=tabungan.filter(x=>x.tanggal.startsWith(bln)).reduce((a,b)=>a+b.nominal,0);$("totalTabunganKelas").textContent=rupiah(total);$("tabunganBulanIni").textContent=rupiah(bulan)}
-function cetakBagian(id){bukaHalaman(id);document.querySelectorAll(".page").forEach(p=>p.classList.remove("printing"));$(id).classList.add("printing");setTimeout(()=>{window.print();$(id).classList.remove("printing")},150)}
-function eksporData(){const data={versi:1,tanggal:hariIni(),siswa,absensi,jurnal,catatan,nilai,mapel,tabungan,setting};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`cadangan-wali-kelas-${hariIni()}.json`;a.click();URL.revokeObjectURL(a.href)}
-$("fileImpor").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!confirm("Impor akan mengganti data aplikasi saat ini. Lanjut?"))return;siswa=d.siswa||[];absensi=d.absensi||{};jurnal=d.jurnal||[];catatan=d.catatan||[];nilai=d.nilai||[];mapel=d.mapel||mapel;tabungan=d.tabungan||[];setting=d.setting||setting;tulis(K.siswa,siswa);tulis(K.absensi,absensi);tulis(K.jurnal,jurnal);tulis(K.catatan,catatan);tulis(K.nilai,nilai);tulis(K.mapel,mapel);tulis(K.tabungan,tabungan);tulis(K.setting,setting);location.reload()}catch{alert("File cadangan tidak valid.")}};r.readAsText(f)};
-
-tampilkanSiswa();tampilkanAbsensi();tampilkanRekap();tampilkanJurnal();tampilkanCatatan();tampilkanNilai();tampilkanMapel();tampilkanTabungan();isiPilihanSiswa();isiPilihanMapel();muatPengaturan();updateDashboard();
+refreshOptions();renderSiswa();renderAbsensi();tampilkanRekap();tampilkanTabungan();renderMapel();renderNilai();renderJurnal();renderCatatan();loadSetting();dashboard();
