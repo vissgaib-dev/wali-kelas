@@ -18,10 +18,13 @@
       <a class="active" data-page="dashboard">🏠 Dashboard</a>
       <a data-page="siswa">👨‍🎓 Data Siswa</a>
       <a data-page="absensi">📅 Absensi</a>
+      <a data-page="scanner">📷 Scan QR Absensi</a>
       <a data-page="rekap">📊 Rekap Kehadiran</a>
       <a data-page="jurnal">📖 Jurnal Mengajar</a>
       <a data-page="catatan">📝 Catatan Siswa</a>
+      <a data-page="mapel">📚 Data Mapel</a>
       <a data-page="nilai">🏅 Nilai Siswa</a>
+      <a data-page="tabungan">💰 Tabungan Siswa</a>
       <a data-page="laporan">🖨️ Cetak Laporan</a>
       <a data-page="pengaturan">⚙️ Pengaturan</a>
     </nav>
@@ -38,6 +41,8 @@
         <div class="card"><div class="icon">✅</div><h3 id="hadirHariIni">0</h3><p>Hadir Hari Ini</p></div>
         <div class="card"><div class="icon">🤒</div><h3 id="izinHariIni">0</h3><p>Sakit / Izin</p></div>
         <div class="card"><div class="icon">❌</div><h3 id="alpaHariIni">0</h3><p>Tanpa Keterangan</p></div>
+        <div class="card"><div class="icon">💰</div><h3 id="totalTabunganKelas">Rp0</h3><p>Total Tabungan Kelas</p></div>
+        <div class="card"><div class="icon">📆</div><h3 id="tabunganBulanIni">Rp0</h3><p>Setoran Bulan Ini</p></div>
       </div>
       <div class="section">
         <h2>Akses Cepat</h2>
@@ -113,12 +118,51 @@
       <div class="section">
         <form id="formNilai" class="form-grid">
           <div class="form-group"><label>Siswa</label><select id="nilaiSiswa" required></select></div>
-          <div class="form-group"><label>Mata Pelajaran</label><input id="nilaiMapel" type="text" required></div>
+          <div class="form-group"><label>Mata Pelajaran</label><select id="nilaiMapel" required></select></div>
           <div class="form-group"><label>Jenis Penilaian</label><input id="nilaiJenis" type="text" placeholder="Contoh: UH 1" required></div>
           <div class="form-group"><label>Nilai</label><input id="nilaiAngka" type="number" min="0" max="100" required></div>
           <div class="form-group full"><button class="btn btn-primary" type="submit">💾 Simpan Nilai</button></div>
         </form>
         <div class="table-wrap"><table><thead><tr><th>Siswa</th><th>Mapel</th><th>Jenis</th><th>Nilai</th><th>Aksi</th></tr></thead><tbody id="tabelNilai"></tbody></table></div>
+      </div>
+    </section>
+
+
+    <section id="scanner" class="page">
+      <div class="header"><div><h1>Scan QR Absensi</h1><p>Scan kartu QR siswa untuk mencatat kehadiran</p></div></div>
+      <div class="section">
+        <div class="info-box">📷 Fitur kamera QR disiapkan untuk tahap online berikutnya. Untuk sekarang, kode kartu bisa diketik atau ditempel di kolom ini.</div>
+        <div class="toolbar"><input id="kodeScan" class="search" placeholder="Masukkan / scan kode siswa"><button class="btn btn-primary" onclick="prosesKodeAbsensi()">✅ Catat Hadir</button></div>
+        <div id="hasilScan" class="scan-result">Belum ada pemindaian.</div>
+      </div>
+    </section>
+
+    <section id="mapel" class="page">
+      <div class="header"><div><h1>Data Mata Pelajaran</h1><p>Simpan mapel sekali, lalu pilih saat mengisi nilai</p></div></div>
+      <div class="section">
+        <form id="formMapel" class="toolbar"><input id="namaMapel" class="search" placeholder="Nama mata pelajaran" required><button class="btn btn-primary" type="submit">➕ Tambah Mapel</button></form>
+        <div class="table-wrap"><table><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Aksi</th></tr></thead><tbody id="tabelMapel"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="tabungan" class="page">
+      <div class="header"><div><h1>Tabungan Siswa</h1><p>Catat setoran harian dan lihat rekap saldo</p></div><div class="profile">💰 <strong id="saldoKelas">Rp0</strong></div></div>
+      <div class="section">
+        <form id="formTabungan" class="form-grid">
+          <div class="form-group"><label>Tanggal</label><input id="tabTanggal" type="date" required></div>
+          <div class="form-group"><label>Siswa</label><select id="tabSiswa" required></select></div>
+          <div class="form-group"><label>Nominal Setoran</label><input id="tabNominal" type="number" min="1" required></div>
+          <div class="form-group"><label>Keterangan</label><input id="tabKet" type="text" placeholder="Opsional"></div>
+          <div class="form-group full"><button class="btn btn-primary" type="submit">💾 Simpan Setoran</button></div>
+        </form>
+      </div>
+      <div class="section">
+        <div class="toolbar"><input id="bulanTabungan" class="search" type="month"><button class="btn btn-secondary" onclick="tampilkanTabungan()">🔄 Tampilkan Bulan</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Siswa</th><th>Nominal</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="tabelTabungan"></tbody></table></div>
+      </div>
+      <div class="section">
+        <h2>Rekap Total Tabungan</h2>
+        <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Siswa</th><th>Bulan Terpilih</th><th>Total Saldo</th></tr></thead><tbody id="rekapTabungan"></tbody></table></div>
       </div>
     </section>
 
@@ -130,6 +174,7 @@
           <button class="report-card" onclick="cetakBagian('rekap')">📊<strong>Rekap Kehadiran</strong><span>Cetak rekap bulan terpilih</span></button>
           <button class="report-card" onclick="cetakBagian('jurnal')">📖<strong>Jurnal Mengajar</strong><span>Cetak jurnal pembelajaran</span></button>
           <button class="report-card" onclick="cetakBagian('nilai')">🏅<strong>Nilai Siswa</strong><span>Cetak daftar nilai</span></button>
+          <button class="report-card" onclick="cetakBagian('tabungan')">💰<strong>Tabungan</strong><span>Cetak rekap tabungan</span></button>
         </div>
       </div>
     </section>
