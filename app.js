@@ -1,3 +1,11 @@
+(async function cekLogin() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    window.location.replace("login.html");
+  }
+})();
+
 const K={siswa:"dataSiswaKelas5",absensi:"absensiKelas5",tabungan:"tabunganKelas5",tagihan:"tagihanKeuanganKelas5",pembayaran:"pembayaranKeuanganKelas5",mapel:"mapelKelas5",nilai:"nilaiKelas5",jurnal:"jurnalKelas5",catatan:"catatanKelas5",setting:"settingKelas5"};
 const $=id=>document.getElementById(id),today=()=>new Date().toISOString().slice(0,10),read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 let siswa=read(K.siswa,[]),absensi=read(K.absensi,{}),tabungan=read(K.tabungan,[]).map(x=>({
