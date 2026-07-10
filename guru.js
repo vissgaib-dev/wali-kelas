@@ -83,7 +83,7 @@ const ADMIN_KEY="wali_kelas_admin_pro_v1";
 let admin=JSON.parse(localStorage.getItem(ADMIN_KEY)||"null")||{mapel:["Pendidikan Pancasila","Bahasa Indonesia","Matematika","IPAS","Seni Budaya","PJOK","Bahasa Inggris"],nilai:[],jurnal:[],catatan:[],identitas:{sekolah:"",npsn:"",alamat:"",desa:"",kecamatan:"",kabupaten:"Lombok Barat",provinsi:"Nusa Tenggara Barat",kepsek:"",nipKepsek:"",wali:"",nipWali:"",kelas:"Kelas 5",tahun:"2026/2027",semester:"Semester 1"}};
 const saveAdmin=()=>localStorage.setItem(ADMIN_KEY,JSON.stringify(admin));
 const nmSiswa=id=>siswa.find(x=>String(x.id)===String(id))?.nama||"Siswa";
-function refreshAdminOptions(){const so='<option value="">Pilih siswa</option>'+siswa.map(x=>`<option value="${x.id}">${x.nomor_absen}. ${esc(x.nama)}</option>`).join("");["nilaiSiswa","catatanSiswa"].forEach(id=>{if($(id))$(id).innerHTML=so});if($("rekapSiswa"))$("rekapSiswa").innerHTML='<option value="">Semua siswa</option>'+siswa.map(x=>`<option value="${x.id}">${x.nomor_absen}. ${esc(x.nama)}</option>`).join("");const mo='<option value="">Pilih mapel</option>'+admin.mapel.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("");["nilaiMapel","jurnalMapel"].forEach(id=>{if($(id))$(id).innerHTML=mo});if($("rekapMapel"))$("rekapMapel").innerHTML='<option value="">Semua mapel</option>'+admin.mapel.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")}
+function refreshAdminOptions(){const so='<option value="">Pilih siswa</option>'+siswa.map(x=>`<option value="${x.id}">${x.nomor_absen}. ${esc(x.nama)}</option>`).join("");["nilaiSiswa","catatanSiswa"].forEach(id=>{if($(id))$(id).innerHTML=so});if($("rekapSiswa"))$("rekapSiswa").innerHTML='<option value="">Semua siswa</option>'+siswa.map(x=>`<option value="${x.id}">${x.nomor_absen}. ${esc(x.nama)}</option>`).join("");const mo='<option value="">Pilih mapel</option>'+admin.mapel.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("");["nilaiMapel","jurnalMapel"].forEach(id=>{if($(id))$(id).innerHTML=mo});if($("rekapMapel"))$("rekapMapel").innerHTML='<option value="">Semua mapel</option>'+admin.mapel.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join("")};isiOpsiRekapAbsensi()
 function renderMapel(){if(!$("tbMapel"))return;$("tbMapel").innerHTML=admin.mapel.map((m,i)=>`<tr><td>${i+1}</td><td><b>${esc(m)}</b></td><td><button class="small danger" onclick="hapusMapel(${i})">Hapus</button></td></tr>`).join("")}
 $("fMapel").onsubmit=e=>{e.preventDefault();const m=$("namaMapel").value.trim();if(!m)return;if(admin.mapel.some(x=>x.toLowerCase()===m.toLowerCase()))return alert("Mapel sudah ada.");admin.mapel.push(m);saveAdmin();e.target.reset();renderMapel();refreshAdminOptions()}
 function hapusMapel(i){if(!confirm("Hapus mata pelajaran ini?"))return;admin.mapel.splice(i,1);saveAdmin();renderMapel();refreshAdminOptions()}
@@ -146,5 +146,80 @@ function loadIdentitas(){const x=admin.identitas,m={idSekolah:"sekolah",idNpsn:"
 $("fIdentitas").onsubmit=e=>{e.preventDefault();admin.identitas={sekolah:$("idSekolah").value.trim(),npsn:$("idNpsn").value.trim(),alamat:$("idAlamat").value.trim(),desa:$("idDesa").value.trim(),kecamatan:$("idKecamatan").value.trim(),kabupaten:$("idKabupaten").value.trim(),provinsi:$("idProvinsi").value.trim(),kepsek:$("idKepsek").value.trim(),nipKepsek:$("idNipKepsek").value.trim(),wali:$("idWali").value.trim(),nipWali:$("idNipWali").value.trim(),kelas:$("idKelas").value.trim(),tahun:$("idTahun").value.trim(),semester:$("idSemester").value};saveAdmin();loadIdentitas();alert("Identitas tersimpan.")}
 function renderLimaHadir(a){if(!$("limaHadir"))return;const ids=(a||[]).filter(x=>x.status==="Hadir").slice(0,5).map(x=>x.siswa_id);$("limaHadir").innerHTML=ids.length?ids.map((id,i)=>`<div class="present-item"><b>${i+1}</b><span>${esc(nmSiswa(id))}</span></div>`).join(""):"Belum ada siswa hadir hari ini."}
 
+
+let dataRekapAbsensi=[];
+
+function isiOpsiRekapAbsensi(){
+  if(!$("rekapAbsSiswa"))return;
+  const lama=$("rekapAbsSiswa").value;
+  $("rekapAbsSiswa").innerHTML='<option value="">Semua siswa</option>'+siswa.map(x=>`<option value="${x.id}">${x.nomor_absen}. ${esc(x.nama)}</option>`).join("");
+  $("rekapAbsSiswa").value=lama;
+}
+
+function ubahModeRekapAbsensi(){
+  const semester=$("rekapAbsMode").value==="semester";
+  $("rekapAbsBulan").style.display=semester?"none":"block";
+  $("rekapAbsSemester").style.display=semester?"block":"none";
+}
+
+function rentangRekapAbsensi(){
+  const mode=$("rekapAbsMode").value;
+  if(mode==="bulan"){
+    const v=$("rekapAbsBulan").value;
+    if(!v)throw new Error("Pilih bulan dulu.");
+    const [y,m]=v.split("-").map(Number);
+    const awal=`${y}-${String(m).padStart(2,"0")}-01`;
+    const akhir=new Date(y,m,0).toISOString().slice(0,10);
+    return {awal,akhir,label:new Date(y,m-1,1).toLocaleDateString("id-ID",{month:"long",year:"numeric"})};
+  }
+  const sem=$("rekapAbsSemester").value;
+  const tahun=admin.identitas.tahun||"2026/2027";
+  const parts=tahun.split("/").map(Number);
+  const y1=parts[0]||new Date().getFullYear(),y2=parts[1]||y1+1;
+  return sem==="1"
+    ?{awal:`${y1}-07-01`,akhir:`${y1}-12-31`,label:`Semester 1 Tahun Pelajaran ${tahun}`}
+    :{awal:`${y2}-01-01`,akhir:`${y2}-06-30`,label:`Semester 2 Tahun Pelajaran ${tahun}`};
+}
+
+async function buatRekapAbsensi(){
+  try{
+    const r=rentangRekapAbsensi(),sid=$("rekapAbsSiswa").value;
+    let q=supabaseClient.from("absensi").select("siswa_id,tanggal,status").gte("tanggal",r.awal).lte("tanggal",r.akhir).order("tanggal");
+    if(sid)q=q.eq("siswa_id",sid);
+    const{data,error}=await q;
+    if(error)throw error;
+    const daftar=sid?siswa.filter(x=>String(x.id)===String(sid)):siswa;
+    dataRekapAbsensi=daftar.map(s=>{
+      const d=(data||[]).filter(a=>String(a.siswa_id)===String(s.id));
+      const hitung=status=>d.filter(a=>a.status===status).length;
+      const hadir=hitung("Hadir"),sakit=hitung("Sakit"),izin=hitung("Izin"),alpa=hitung("Alpa"),total=d.length;
+      return {nomor_absen:s.nomor_absen,nama:s.nama,hadir,sakit,izin,alpa,total,persen:total?((hadir/total)*100).toFixed(1):"0.0"};
+    });
+    const semua=data||[],hariUnik=new Set(semua.map(x=>x.tanggal)).size;
+    $("rekapHariTercatat").textContent=hariUnik;
+    $("rekapTotalHadir").textContent=semua.filter(x=>x.status==="Hadir").length;
+    $("rekapTotalSakit").textContent=semua.filter(x=>x.status==="Sakit").length;
+    $("rekapTotalIzinAlpa").textContent=semua.filter(x=>x.status==="Izin"||x.status==="Alpa").length;
+    $("judulRekapAbsensi").textContent="Rekap Absensi "+r.label;
+    $("subjudulRekapAbsensi").textContent=[admin.identitas.sekolah,admin.identitas.kelas,admin.identitas.wali].filter(Boolean).join(" • ")||"Kelas 5";
+    $("tbRekapAbsensi").innerHTML=dataRekapAbsensi.map(x=>`<tr><td>${x.nomor_absen}</td><td><b>${esc(x.nama)}</b></td><td>${x.hadir}</td><td>${x.sakit}</td><td>${x.izin}</td><td>${x.alpa}</td><td>${x.total}</td><td><b>${x.persen}%</b></td></tr>`).join("")||'<tr><td colspan="8">Belum ada data absensi pada periode ini.</td></tr>';
+  }catch(e){alert("Rekap gagal: "+e.message)}
+}
+
+function exportRekapAbsensi(){
+  if(!dataRekapAbsensi.length)return alert("Tampilkan rekap dulu.");
+  const data=dataRekapAbsensi.map(x=>({"No. Absen":x.nomor_absen,"Nama Siswa":x.nama,"Hadir":x.hadir,"Sakit":x.sakit,"Izin":x.izin,"Alpa":x.alpa,"Total Tercatat":x.total,"Persentase Kehadiran":x.persen+"%"}));
+  const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Rekap Absensi");
+  XLSX.writeFile(wb,"Rekap_Absensi_Kelas_5.xlsx");
+}
+
+function cetakRekapAbsensi(){
+  if(!dataRekapAbsensi.length)return alert("Tampilkan rekap dulu.");
+  const isi=$("areaCetakRekapAbsensi").innerHTML,w=window.open("","_blank");
+  w.document.write(`<!doctype html><html><head><title>Rekap Absensi</title><style>body{font-family:Arial;padding:28px;color:#17243a}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:8px;text-align:left}th{background:#eee}h2{margin-bottom:6px}.muted{color:#555}@media print{button{display:none}}</style></head><body>${isi}</body></html>`);
+  w.document.close();w.focus();w.print();
+}
+
 async function keluar(){await supabaseClient.auth.signOut();location.href="index.html"}
-$("today").textContent=new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});$("tglAbs").value=new Date().toISOString().slice(0,10);if($("jurnalTanggal"))$("jurnalTanggal").value=new Date().toISOString().slice(0,10);if($("catatanTanggal"))$("catatanTanggal").value=new Date().toISOString().slice(0,10);cek();
+if($("rekapAbsBulan"))$("rekapAbsBulan").value=new Date().toISOString().slice(0,7);$("today").textContent=new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});$("tglAbs").value=new Date().toISOString().slice(0,10);if($("jurnalTanggal"))$("jurnalTanggal").value=new Date().toISOString().slice(0,10);if($("catatanTanggal"))$("catatanTanggal").value=new Date().toISOString().slice(0,10);cek();
