@@ -5,3 +5,14 @@
 .tab-cards,.mini-cards{margin-top:0}
 .mini-cards .card{padding:18px}
 @media(max-width:760px){.tab-cards,.mini-cards{grid-template-columns:1fr}}
+
+.kas-tabs{display:flex;gap:10px;overflow:auto;margin-bottom:22px;padding-bottom:5px}
+.kas-tab{border:0;background:#eaf0f7;color:#174a7c;padding:13px 18px;border-radius:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.kas-tab.active{background:#174a7c;color:#fff}
+.kas-panel{display:none}.kas-panel.active{display:block}
+.tagihan-list{display:grid;gap:15px}
+.tagihan-card{border:1px solid #dfe6ef;border-radius:15px;padding:18px;background:#fbfcfe}
+.tagihan-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+.tagihan-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.payment-grid{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:14px;padding-top:14px;border-top:1px solid #e6ebf2}
+@media(max-width:760px){.payment-grid{grid-template-columns:1fr}.kas-tabs{margin-left:-5px;margin-right:-5px}}

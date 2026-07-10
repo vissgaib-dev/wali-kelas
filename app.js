@@ -1,10 +1,10 @@
-const K={siswa:"dataSiswaKelas5",absensi:"absensiKelas5",tabungan:"tabunganKelas5",mapel:"mapelKelas5",nilai:"nilaiKelas5",jurnal:"jurnalKelas5",catatan:"catatanKelas5",setting:"settingKelas5"};
+const K={siswa:"dataSiswaKelas5",absensi:"absensiKelas5",tabungan:"tabunganKelas5",tagihan:"tagihanKeuanganKelas5",pembayaran:"pembayaranKeuanganKelas5",mapel:"mapelKelas5",nilai:"nilaiKelas5",jurnal:"jurnalKelas5",catatan:"catatanKelas5",setting:"settingKelas5"};
 const $=id=>document.getElementById(id),today=()=>new Date().toISOString().slice(0,10),read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 let siswa=read(K.siswa,[]),absensi=read(K.absensi,{}),tabungan=read(K.tabungan,[]).map(x=>({
   ...x,
   jenis:x.jenis||"Setoran",
   nominal:Number(x.nominal||0)
-})),mapel=read(K.mapel,["Bahasa Indonesia","Matematika","IPAS","Pendidikan Pancasila"]),nilai=read(K.nilai,[]),jurnal=read(K.jurnal,[]),catatan=read(K.catatan,[]),setting=read(K.setting,{wali:"Wali Kelas 5",kelas:"Kelas 5",sekolah:"",tahun:"2026/2027"}),editIndex=null;
+})),tagihan=read(K.tagihan,[]),pembayaran=read(K.pembayaran,[]),mapel=read(K.mapel,["Bahasa Indonesia","Matematika","IPAS","Pendidikan Pancasila"]),nilai=read(K.nilai,[]),jurnal=read(K.jurnal,[]),catatan=read(K.catatan,[]),setting=read(K.setting,{wali:"Wali Kelas 5",kelas:"Kelas 5",sekolah:"",tahun:"2026/2027"}),editIndex=null;
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])),rp=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n||0);
 function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2200)}
 document.querySelectorAll(".menu a").forEach(a=>a.onclick=()=>bukaHalaman(a.dataset.page));
@@ -86,7 +86,7 @@ $("formPenarikan").onsubmit=e=>{
   write(K.tabungan,tabungan);e.target.reset();$("tarikTanggal").value=today();refreshOptions();tampilkanTabungan();renderKegiatanMassal();dashboard();toast("Penarikan tersimpan")
 };
 
-function renderKegiatanMassal(){
+function renderKegiatanMassal(){return;
   $("tabelKegiatanMassal").innerHTML=siswa.map(s=>`<tr><td><input class="pilih-kegiatan" data-absen="${s.absen}" type="checkbox"></td><td>${s.absen}</td><td><b>${esc(s.nama)}</b></td><td>${rp(saldoSiswa(s.absen))}</td></tr>`).join("");
 }
 function pilihSemuaKegiatan(v){document.querySelectorAll(".pilih-kegiatan").forEach(x=>x.checked=v)}
@@ -102,8 +102,8 @@ function simpanKegiatanMassal(){
 }
 
 function tampilkanTabungan(){
-  const b=$("bulanTabungan").value||today().slice(0,7),filter=$("filterJenis").value;
-  const d=tabungan.filter(x=>x.tanggal.startsWith(b)&&(!filter||x.jenis===filter));
+  const b=$("bulanTabungan").value||today().slice(0,7);
+  const d=tabungan.filter(x=>x.tanggal.startsWith(b));
   $("tabelTabungan").innerHTML=d.length?d.map(x=>{
     const i=tabungan.indexOf(x),s=siswa.find(a=>a.absen===x.absen),masuk=x.jenis==="Setoran"?x.nominal:0,keluar=x.jenis==="Setoran"?0:x.nominal;
     const ket=x.jenis==="Penarikan"?`${x.ket||"Penarikan"} • Pengambil: ${x.pengambil||"-"}`:x.jenis==="Kegiatan"?`${x.namaKegiatan||"Kegiatan"}${x.ket?` • ${x.ket}`:""}`:x.ket||"Setoran";
@@ -118,10 +118,70 @@ function tampilkanTabungan(){
   }).join("");
 
   const masuk=tabungan.filter(x=>x.jenis==="Setoran").reduce((a,x)=>a+x.nominal,0),keluar=tabungan.filter(x=>x.jenis!=="Setoran").reduce((a,x)=>a+x.nominal,0);
-  $("totalSetoran").textContent=rp(masuk);$("totalKeluar").textContent=rp(keluar);$("saldoTabungan").textContent=rp(masuk-keluar);$("saldoKelas").textContent=rp(masuk-keluar);
+  $("totalSetoran").textContent=rp(masuk);$("totalPenarikan").textContent=rp(keluar);$("saldoTabungan").textContent=rp(masuk-keluar);$("saldoKelas").textContent=rp(masuk-keluar);
 }
 function hapusTab(i){if(confirm("Hapus transaksi ini?")){tabungan.splice(i,1);write(K.tabungan,tabungan);tampilkanTabungan();renderSetoranMassal();tampilkanRekapHarian();renderKegiatanMassal();dashboard()}}
 
+
+function bukaKasTab(id,btn){
+  document.querySelectorAll(".kas-panel").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".kas-tab").forEach(x=>x.classList.remove("active"));
+  $(id).classList.add("active");btn.classList.add("active");
+  renderKeuangan();
+}
+function buatTagihan(jenis,nama,nominal,tanggal,ket="",periode=""){
+  tagihan.unshift({id:Date.now().toString()+Math.random().toString(16).slice(2),jenis,nama,nominal:Number(nominal),tanggal,ket,periode,aktif:true});
+  write(K.tagihan,tagihan);renderKeuangan();toast(`Tagihan ${jenis} dibuat`);
+}
+$("formTagihanKas").onsubmit=e=>{e.preventDefault();buatTagihan("Kas",$("kasNama").value.trim(),$("kasNominal").value,$("kasJatuhTempo").value,"",$("kasPeriode").value);e.target.reset()};
+$("formKegiatan").onsubmit=e=>{e.preventDefault();buatTagihan("Kegiatan",$("kegiatanNama").value.trim(),$("kegiatanNominal").value,$("kegiatanTanggal").value,$("kegiatanKet").value.trim());e.target.reset()};
+$("formLKS").onsubmit=e=>{e.preventDefault();buatTagihan("LKS",$("lksNama").value.trim(),$("lksNominal").value,$("lksTanggal").value,$("lksKet").value.trim());e.target.reset()};
+
+function sudahBayar(id,absen){return pembayaran.some(x=>x.tagihanId===id&&x.absen===absen)}
+function simpanPembayaran(id){
+  const t=tagihan.find(x=>x.id===id);if(!t)return;
+  const absen=Number($(`bayar-siswa-${id}`).value),metode=$(`bayar-metode-${id}`).value,tanggal=$(`bayar-tanggal-${id}`).value;
+  if(!absen||!tanggal)return alert("Pilih siswa dan tanggal.");
+  if(sudahBayar(id,absen))return alert("Siswa ini sudah tercatat membayar tagihan tersebut.");
+  if(metode==="Potong Tabungan"){
+    if(t.jenis==="Kas")return alert("Uang kas tidak boleh otomatis dipotong dari tabungan.");
+    if(saldoSiswa(absen)<t.nominal)return alert(`Saldo tabungan tidak cukup. Saldo saat ini ${rp(saldoSiswa(absen))}.`);
+    if(!confirm(`Pastikan ada izin orang tua. Potong tabungan sebesar ${rp(t.nominal)}?`))return;
+    tabungan.unshift({tanggal,absen,jenis:"Penarikan",nominal:t.nominal,pengambil:"Pembayaran "+t.jenis,ket:`Potong tabungan untuk ${t.nama}`,sumber:"Pembayaran Tagihan",refId:id});
+    write(K.tabungan,tabungan);
+  }
+  pembayaran.unshift({id:Date.now().toString(),tagihanId:id,jenis:t.jenis,nama:t.nama,absen,nominal:t.nominal,tanggal,metode});
+  write(K.pembayaran,pembayaran);renderKeuangan();tampilkanTabungan();dashboard();toast("Pembayaran tersimpan");
+}
+function hapusTagihan(id){
+  if(pembayaran.some(x=>x.tagihanId===id))return alert("Tagihan sudah memiliki pembayaran dan tidak bisa dihapus. Hapus riwayat pembayarannya dulu.");
+  if(confirm("Hapus tagihan ini?")){tagihan=tagihan.filter(x=>x.id!==id);write(K.tagihan,tagihan);renderKeuangan()}
+}
+function hapusPembayaran(i){
+  const p=pembayaran[i];if(!p||!confirm("Hapus riwayat pembayaran ini?"))return;
+  if(p.metode==="Potong Tabungan"){const idx=tabungan.findIndex(x=>x.refId===p.tagihanId&&x.absen===p.absen&&x.tanggal===p.tanggal);if(idx>=0)tabungan.splice(idx,1);write(K.tabungan,tabungan)}
+  pembayaran.splice(i,1);write(K.pembayaran,pembayaran);renderKeuangan();tampilkanTabungan();dashboard();
+}
+function kartuTagihan(t){
+  const lunas=siswa.filter(s=>sudahBayar(t.id,s.absen)).length;
+  const metode=t.jenis==="Kas"?'<option>Tunai</option>':'<option>Tunai</option><option>Potong Tabungan</option>';
+  return `<div class="tagihan-card"><div class="tagihan-head"><div><h3>${esc(t.nama)}</h3><p>${esc(t.jenis)} • ${rp(t.nominal)} per anak • Jatuh tempo ${t.tanggal}${t.periode?` • ${esc(t.periode)}`:""}</p></div><b>${lunas}/${siswa.length} Lunas</b></div>
+  <div class="payment-grid"><label>Siswa<select id="bayar-siswa-${t.id}">${optionsSiswa()}</select></label><label>Metode<select id="bayar-metode-${t.id}">${metode}</select></label><label>Tanggal<input id="bayar-tanggal-${t.id}" type="date" value="${today()}"></label><button class="btn primary" onclick="simpanPembayaran('${t.id}')">💾 Bayar</button></div>
+  <div class="tagihan-actions"><button class="btn danger small" onclick="hapusTagihan('${t.id}')">🗑️ Hapus Tagihan</button></div></div>`;
+}
+function renderKeuangan(){
+  $("daftarTagihanKas").innerHTML=tagihan.filter(x=>x.jenis==="Kas").map(kartuTagihan).join("")||'<div class="info">Belum ada tagihan uang kas.</div>';
+  $("daftarKegiatan").innerHTML=tagihan.filter(x=>x.jenis==="Kegiatan").map(kartuTagihan).join("")||'<div class="info">Belum ada tagihan kegiatan.</div>';
+  $("daftarLKS").innerHTML=tagihan.filter(x=>x.jenis==="LKS").map(kartuTagihan).join("")||'<div class="info">Belum ada tagihan LKS.</div>';
+  const rows=jenis=>pembayaran.filter(x=>x.jenis===jenis).map(p=>{const i=pembayaran.indexOf(p),s=siswa.find(x=>x.absen===p.absen);return `<tr><td>${p.tanggal}</td><td>${esc(s?.nama||"Siswa dihapus")}</td><td>${esc(p.nama)}</td>${jenis==="Kas"?"":`<td>${esc(p.metode)}</td>`}<td>${rp(p.nominal)}</td><td><button class="btn danger small" onclick="hapusPembayaran(${i})">🗑️</button></td></tr>`}).join("");
+  $("tabelPembayaranKas").innerHTML=rows("Kas")||'<tr><td colspan="5">Belum ada pembayaran</td></tr>';
+  $("tabelPembayaranKegiatan").innerHTML=rows("Kegiatan")||'<tr><td colspan="6">Belum ada pembayaran</td></tr>';
+  $("tabelPembayaranLKS").innerHTML=rows("LKS")||'<tr><td colspan="6">Belum ada pembayaran</td></tr>';
+  const totalJenis=j=>pembayaran.filter(x=>x.jenis===j).reduce((a,x)=>a+x.nominal,0);
+  $("rekapSaldoTabungan").textContent=rp(tabungan.reduce((a,x)=>a+(x.jenis==="Setoran"?x.nominal:-x.nominal),0));
+  $("rekapKasMasuk").textContent=rp(totalJenis("Kas"));$("rekapKegiatanMasuk").textContent=rp(totalJenis("Kegiatan"));$("rekapLKSMasuk").textContent=rp(totalJenis("LKS"));
+  $("tabelRekapKas").innerHTML=siswa.map(s=>`<tr><td>${s.absen}</td><td><b>${esc(s.nama)}</b></td><td>${rp(saldoSiswa(s.absen))}</td><td>${rp(pembayaran.filter(x=>x.absen===s.absen&&x.jenis==="Kas").reduce((a,x)=>a+x.nominal,0))}</td><td>${rp(pembayaran.filter(x=>x.absen===s.absen&&x.jenis==="Kegiatan").reduce((a,x)=>a+x.nominal,0))}</td><td>${rp(pembayaran.filter(x=>x.absen===s.absen&&x.jenis==="LKS").reduce((a,x)=>a+x.nominal,0))}</td></tr>`).join("");
+}
 $("formMapel").onsubmit=e=>{e.preventDefault();const n=$("namaMapel").value.trim();if(n&&!mapel.some(x=>x.toLowerCase()===n.toLowerCase())){mapel.push(n);mapel.sort();write(K.mapel,mapel);renderMapel();refreshOptions();e.target.reset();toast("Mapel ditambahkan")}};
 function renderMapel(){$("tabelMapel").innerHTML=mapel.map((m,i)=>`<tr><td>${i+1}</td><td><b>${esc(m)}</b></td><td><button class="btn danger small" onclick="hapusMapel(${i})">🗑️</button></td></tr>`).join("")}
 function hapusMapel(i){if(confirm("Hapus mapel?")){mapel.splice(i,1);write(K.mapel,mapel);renderMapel();refreshOptions()}}
@@ -151,6 +211,8 @@ add("Data Siswa",siswa.map(s=>({No_Absen:s.absen,Nama:s.nama,Jenis_Kelamin:s.jk,
 const a=[];Object.entries(absensi).forEach(([t,d])=>siswa.forEach(s=>a.push({Tanggal:t,No_Absen:s.absen,Nama:s.nama,Status:d[s.absen]||""})));add("Absensi",a);
 add("Tabungan",tabungan.map(x=>({Tanggal:x.tanggal,No_Absen:x.absen,Nama:siswa.find(s=>s.absen===x.absen)?.nama||"",Jenis:x.jenis||"Setoran",Nominal:x.nominal,Nama_Pengambil:x.pengambil||"",Nama_Kegiatan:x.namaKegiatan||"",Keterangan:x.ket||""})));
 add("Rekap Tabungan",siswa.map(s=>{const d=tabungan.filter(x=>x.absen===s.absen),masuk=d.filter(x=>x.jenis==="Setoran").reduce((a,x)=>a+x.nominal,0),keluar=d.filter(x=>x.jenis!=="Setoran").reduce((a,x)=>a+x.nominal,0);return {No_Absen:s.absen,Nama:s.nama,Total_Setoran:masuk,Total_Keluar:keluar,Saldo_Akhir:masuk-keluar}}));
+add("Tagihan Keuangan",tagihan.map(x=>({ID:x.id,Jenis:x.jenis,Nama_Tagihan:x.nama,Nominal:x.nominal,Jatuh_Tempo:x.tanggal,Periode:x.periode||"",Keterangan:x.ket||""})));
+add("Pembayaran Keuangan",pembayaran.map(x=>({Tanggal:x.tanggal,No_Absen:x.absen,Nama:siswa.find(s=>s.absen===x.absen)?.nama||"",Jenis:x.jenis,Tagihan:x.nama,Metode:x.metode,Nominal:x.nominal})));
 add("Data Mapel",mapel.map(m=>({Mata_Pelajaran:m})));
 add("Nilai",nilai.map(n=>({Semester:n.semester||1,No_Absen:n.absen,Nama:siswa.find(s=>s.absen===n.absen)?.nama||"",Mata_Pelajaran:n.mapel,Jenis_Penilaian:n.jenis,Kegiatan_TP:n.kegiatan||"",Nilai:n.angka})));
 add("Jurnal",jurnal.map(x=>({Tanggal:x.tanggal,Mata_Pelajaran:x.mapel,Materi_Kegiatan:x.materi})));
@@ -163,8 +225,8 @@ d=rows("Data Mapel");if(d)mapel=d.filter(x=>x.Mata_Pelajaran).map(x=>String(x.Ma
 d=rows("Tabungan");if(d)tabungan=d.filter(x=>x.Tanggal&&x.No_Absen).map(x=>({tanggal:String(x.Tanggal).slice(0,10),absen:Number(x.No_Absen),jenis:String(x.Jenis||"Setoran"),nominal:Number(x.Nominal),pengambil:String(x.Nama_Pengambil||""),namaKegiatan:String(x.Nama_Kegiatan||""),ket:String(x.Keterangan||"")})),write(K.tabungan,tabungan);
 d=rows("Nilai");if(d)nilai=d.filter(x=>x.No_Absen&&x.Mata_Pelajaran).map(x=>({semester:String(x.Semester||1),absen:Number(x.No_Absen),mapel:String(x.Mata_Pelajaran),jenis:String(x.Jenis_Penilaian),kegiatan:String(x.Kegiatan_TP||""),angka:Number(x.Nilai)})),write(K.nilai,nilai);
 alert("Impor selesai. Aplikasi akan dimuat ulang.");location.reload()}
-function eksporJSON(){const blob=new Blob([JSON.stringify({siswa,absensi,tabungan,mapel,nilai,jurnal,catatan,setting},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`backup-wali-kelas-${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
+function eksporJSON(){const blob=new Blob([JSON.stringify({siswa,absensi,tabungan,tagihan,pembayaran,mapel,nilai,jurnal,catatan,setting},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`backup-wali-kelas-${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
 $("fileJSON").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!confirm("Ganti semua data dengan backup ini?"))return;Object.entries(K).forEach(([n,k])=>{if(d[n]!==undefined)write(k,d[n])});location.reload()}catch{alert("File JSON tidak valid.")}};r.readAsText(f)}
 function cetakBagian(id){bukaHalaman(id);document.querySelectorAll(".page").forEach(p=>p.classList.remove("printing"));$(id).classList.add("printing");setTimeout(()=>{window.print();$(id).classList.remove("printing")},120)}
 
-refreshOptions();renderSiswa();renderAbsensi();tampilkanRekap();renderSetoranMassal();tampilkanRekapHarian();tampilkanTabungan();renderKegiatanMassal();renderMapel();renderNilai();renderJurnal();renderCatatan();loadSetting();dashboard();
+refreshOptions();renderSiswa();renderAbsensi();tampilkanRekap();renderSetoranMassal();tampilkanRekapHarian();tampilkanTabungan();renderKegiatanMassal();renderKeuangan();renderMapel();renderNilai();renderJurnal();renderCatatan();loadSetting();dashboard();
