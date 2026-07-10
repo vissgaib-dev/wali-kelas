@@ -83,21 +83,79 @@
 </section>
 
 <section id="tabungan" class="page">
-  <div class="header"><div><h1>Tabungan Siswa</h1><p>Setoran harian, rekap bulanan, dan total saldo</p></div><div class="profile">💰 <strong id="saldoKelas">Rp0</strong></div></div>
-  <div class="section" id="formSetoran">
-    <h2>Catat Setoran</h2>
+  <div class="header"><div><h1>Kas Tabungan Siswa</h1><p>Setoran, penarikan, pengeluaran kegiatan, dan saldo lengkap</p></div><div class="profile">💰 <strong id="saldoKelas">Rp0</strong></div></div>
+
+  <div class="cards tab-cards">
+    <div class="card"><span>⬆️</span><h3 id="totalSetoran">Rp0</h3><p>Total Setoran</p></div>
+    <div class="card"><span>⬇️</span><h3 id="totalKeluar">Rp0</h3><p>Total Uang Keluar</p></div>
+    <div class="card"><span>💰</span><h3 id="saldoTabungan">Rp0</h3><p>Saldo Akhir Kelas</p></div>
+  </div>
+
+  <div class="section">
+    <h2>⚡ Input Setoran Harian Semua Siswa</h2>
+    <div class="toolbar">
+      <input id="tanggalSetoranMassal" class="search" type="date">
+      <button class="btn primary" onclick="simpanSetoranMassal()">💾 Simpan Semua Setoran</button>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Siswa</th><th>Setoran Hari Ini</th><th>Status</th></tr></thead><tbody id="tabelSetoranMassal"></tbody></table></div>
+  </div>
+
+  <div class="section">
+    <h2>📅 Rekap Harian Seluruh Anak</h2>
+    <div class="toolbar"><input id="tanggalRekapHarian" class="search" type="date"><button class="btn secondary" onclick="tampilkanRekapHarian()">🔄 Tampilkan</button></div>
+    <div class="cards mini-cards">
+      <div class="card"><h3 id="jumlahSetorHari">0</h3><p>Anak Setor</p></div>
+      <div class="card"><h3 id="jumlahBelumHari">0</h3><p>Belum Setor</p></div>
+      <div class="card"><h3 id="totalMasukHari">Rp0</h3><p>Total Masuk Hari Itu</p></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama</th><th>Nominal</th><th>Status</th></tr></thead><tbody id="tabelRekapHarian"></tbody></table></div>
+  </div>
+
+  <div class="section">
+    <h2>➕ Setoran Satu Siswa / Susulan</h2>
     <form id="formTabungan" class="form-grid">
       <label>Tanggal<input id="tabTanggal" type="date" required></label>
       <label>Siswa<select id="tabSiswa" required></select></label>
       <label>Nominal<input id="tabNominal" type="number" min="1" required></label>
-      <label>Keterangan<input id="tabKet" placeholder="Opsional"></label>
+      <label>Keterangan<input id="tabKet" placeholder="Contoh: Setoran susulan"></label>
       <div class="full"><button class="btn primary" type="submit">💾 Simpan Setoran</button></div>
     </form>
   </div>
-  <div class="section"><h2>Riwayat Bulanan</h2><div class="toolbar"><input id="bulanTabungan" class="search" type="month"><button class="btn secondary" onclick="tampilkanTabungan()">🔄 Tampilkan</button></div>
-    <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Siswa</th><th>Nominal</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="tabelTabungan"></tbody></table></div>
+
+  <div class="section">
+    <h2>💸 Penarikan Tabungan Satu Anak</h2>
+    <form id="formPenarikan" class="form-grid">
+      <label>Tanggal<input id="tarikTanggal" type="date" required></label>
+      <label>Siswa<select id="tarikSiswa" required></select></label>
+      <label>Nominal Penarikan<input id="tarikNominal" type="number" min="1" required></label>
+      <label>Nama Pengambil<input id="tarikPengambil" placeholder="Ayah / Ibu / Wali" required></label>
+      <label class="full">Alasan / Keterangan<input id="tarikKet" placeholder="Contoh: Keperluan sekolah"></label>
+      <div class="full"><button class="btn primary" type="submit">💾 Simpan Penarikan</button></div>
+    </form>
   </div>
-  <div class="section"><h2>Rekap Per Anak</h2><div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama</th><th>Bulan Terpilih</th><th>Total Keseluruhan</th></tr></thead><tbody id="rekapTabungan"></tbody></table></div></div>
+
+  <div class="section">
+    <h2>🎉 Pengeluaran Kegiatan Massal</h2>
+    <div class="form-grid">
+      <label>Tanggal<input id="kegiatanTanggal" type="date"></label>
+      <label>Nama Kegiatan<input id="kegiatanNama" placeholder="Contoh: Kegiatan kelas"></label>
+      <label>Nominal per Anak<input id="kegiatanNominal" type="number" min="1"></label>
+      <label>Keterangan<input id="kegiatanKet" placeholder="Opsional"></label>
+    </div>
+    <div class="toolbar"><button class="btn secondary" onclick="pilihSemuaKegiatan(true)">☑️ Pilih Semua</button><button class="btn secondary" onclick="pilihSemuaKegiatan(false)">⬜ Kosongkan</button><button class="btn primary" onclick="simpanKegiatanMassal()">💾 Simpan Pengeluaran Kegiatan</button></div>
+    <div class="table-wrap"><table><thead><tr><th>Pilih</th><th>No.</th><th>Nama Siswa</th><th>Saldo Saat Ini</th></tr></thead><tbody id="tabelKegiatanMassal"></tbody></table></div>
+  </div>
+
+  <div class="section">
+    <h2>🧾 Riwayat Transaksi Lengkap</h2>
+    <div class="toolbar"><input id="bulanTabungan" class="search" type="month"><select id="filterJenis" class="search"><option value="">Semua Jenis</option><option value="Setoran">Setoran</option><option value="Penarikan">Penarikan</option><option value="Kegiatan">Kegiatan</option></select><button class="btn secondary" onclick="tampilkanTabungan()">🔄 Tampilkan</button></div>
+    <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Siswa</th><th>Jenis</th><th>Masuk</th><th>Keluar</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="tabelTabungan"></tbody></table></div>
+  </div>
+
+  <div class="section">
+    <h2>📊 Rekap Per Anak: Bulanan dan Total</h2>
+    <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama</th><th>Masuk Bulan Ini</th><th>Keluar Bulan Ini</th><th>Saldo Bulan Ini</th><th>Total Masuk</th><th>Total Keluar</th><th>Saldo Akhir</th></tr></thead><tbody id="rekapTabungan"></tbody></table></div>
+  </div>
 </section>
 
 <section id="mapel" class="page">
