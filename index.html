@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wali Kelas 5</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .sidebar {
+      position: fixed;
+      width: 250px;
+      height: 100vh;
+      background: #123b6d;
+      color: white;
+      padding: 25px 18px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .logo h2 {
+      font-size: 22px;
+    }
+
+    .logo p {
+      margin-top: 7px;
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    .menu a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 14px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .main {
+      margin-left: 250px;
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+    }
+
+    .header p {
+      margin-top: 6px;
+      color: #6b7280;
+    }
+
+    .profile {
+      background: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 22px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    }
+
+    .card .icon {
+      font-size: 30px;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      font-size: 30px;
+      margin-bottom: 5px;
+    }
+
+    .card p {
+      color: #6b7280;
+    }
+
+    .section {
+      margin-top: 25px;
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    }
+
+    .section h2 {
+      margin-bottom: 20px;
+    }
+
+    .quick-menu {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .quick-button {
+      border: none;
+      background: #eef4fb;
+      padding: 20px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .quick-button:hover {
+      background: #dbeafe;
+    }
+
+    @media (max-width: 800px) {
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 18px;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .quick-menu {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .header {
+        display: block;
+      }
+
+      .profile {
+        margin-top: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>🎓 WALI KELAS 5</h2>
+      <p>Administrasi Kelas</p>
+    </div>
+
+    <nav class="menu">
+      <a class="active">🏠 Dashboard</a>
+      <a>👨‍🎓 Data Siswa</a>
+      <a>📅 Absensi</a>
+      <a>📊 Rekap Kehadiran</a>
+      <a>📖 Jurnal Mengajar</a>
+      <a>📝 Catatan Siswa</a>
+      <a>🏅 Nilai Siswa</a>
+      <a>🖨️ Cetak Laporan</a>
+      <a>⚙️ Pengaturan</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <div class="header">
+      <div>
+        <h1>Dashboard Wali Kelas</h1>
+        <p>Selamat datang di aplikasi administrasi Kelas 5</p>
+      </div>
+
+      <div class="profile">
+        👨‍🏫 <strong>Wali Kelas 5</strong>
+      </div>
+    </div>
+
+    <section class="cards">
+
+      <div class="card">
+        <div class="icon">👨‍🎓</div>
+        <h3>28</h3>
+        <p>Jumlah Siswa</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">✅</div>
+        <h3>28</h3>
+        <p>Hadir Hari Ini</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">🤒</div>
+        <h3>0</h3>
+        <p>Sakit / Izin</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">❌</div>
+        <h3>0</h3>
+        <p>Tanpa Keterangan</p>
+      </div>
+
+    </section>
+
+    <section class="section">
+      <h2>Akses Cepat</h2>
+
+      <div class="quick-menu">
+        <button class="quick-button">➕<br><br>Tambah Siswa</button>
+        <button class="quick-button">📅<br><br>Isi Absensi</button>
+        <button class="quick-button">📖<br><br>Isi Jurnal</button>
+        <button class="quick-button">🖨️<br><br>Cetak Laporan</button>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>
