@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login Orang Tua | Wali Kelas 5</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;min-height:100vh;background:linear-gradient(135deg,#10243f,#24527f);display:flex;align-items:center;justify-content:center;padding:24px;color:#14243b}.card{width:100%;max-width:470px;background:#fff;border-radius:26px;padding:48px;box-shadow:0 28px 70px #0005}.logo{width:74px;height:74px;margin:auto;border-radius:20px;background:#2869df;display:grid;place-items:center;font-size:38px}.badge{margin:22px auto 0;width:max-content;background:#eef5ff;color:#205d9b;padding:8px 13px;border-radius:999px;font-size:13px;font-weight:800}h1{text-align:center;font-size:34px;margin:18px 0 8px}.sub{text-align:center;color:#6b788b;line-height:1.6;margin-bottom:32px}label{display:block;font-weight:800;margin-bottom:9px}input{width:100%;padding:17px;border:1px solid #d6dfeb;border-radius:13px;font-size:17px;outline:none;letter-spacing:1px}input:focus{border-color:#2b70d6;box-shadow:0 0 0 4px #2b70d61c}button{width:100%;margin-top:22px;padding:17px;border:0;border-radius:13px;background:#2869df;color:#fff;font-size:17px;font-weight:800;cursor:pointer}button:disabled{opacity:.65}.hint{text-align:center;color:#8793a4;font-size:13px;margin-top:14px}.help{text-align:center;border-top:1px solid #e7edf4;margin-top:28px;padding-top:22px;color:#778599;line-height:1.6}#pesan{text-align:center;min-height:22px;margin-top:16px;font-weight:700}@media(max-width:520px){.card{padding:36px 24px}h1{font-size:29px}}
+</style>
+</head>
+<body>
+<main class="card">
+<div class="logo">👨‍👩‍👧</div>
+<div class="badge">PORTAL ORANG TUA</div>
+<h1>Wali Kelas 5</h1>
+<p class="sub">Masukkan NISN anak untuk membuka informasi siswa.</p>
+<form id="formLogin">
+<label for="nisn">NISN Siswa</label>
+<input id="nisn" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="Masukkan NISN" required>
+<div class="hint">Gunakan NISN yang terdaftar pada data siswa kelas.</div>
+<button id="tombolLogin" type="submit">Masuk ke Portal Orang Tua</button>
+<div id="pesan"></div>
+</form>
+<div class="help">NISN tidak dikenali?<br><strong>Hubungi Wali Kelas 5.</strong></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+const formLogin=document.getElementById("formLogin");
+const tombolLogin=document.getElementById("tombolLogin");
+const pesan=document.getElementById("pesan");
+
+formLogin.addEventListener("submit",async(e)=>{
+  e.preventDefault();
+  const nisn=document.getElementById("nisn").value.replace(/\D/g,"").trim();
+  if(!nisn){pesan.style.color="#c62828";pesan.textContent="Masukkan NISN siswa.";return}
+  tombolLogin.disabled=true;
+  tombolLogin.textContent="Memeriksa...";
+  pesan.textContent="";
+
+  const {data,error}=await supabaseClient
+    .from("siswa")
+    .select("id,nama,nisn")
+    .eq("nisn",nisn)
+    .maybeSingle();
+
+  if(error||!data){
+    pesan.style.color="#c62828";
+    pesan.textContent="NISN tidak ditemukan.";
+    tombolLogin.disabled=false;
+    tombolLogin.textContent="Masuk ke Portal Orang Tua";
+    return;
+  }
+
+  sessionStorage.setItem("portal_siswa_id",data.id);
+  sessionStorage.setItem("portal_siswa_nama",data.nama||"Siswa");
+  pesan.style.color="#16834a";
+  pesan.textContent="Data ditemukan. Membuka portal...";
+  setTimeout(()=>location.href="portal-orang-tua.html",500);
+});
+</script>
+</body>
+</html>
