@@ -21,6 +21,7 @@ function bukaHalaman(id) {
   });
 
   if (id === "siswa") tampilkanSiswa();
+  if (id === "absensi") tampilkanAbsensi();
 }
 
 function bukaTambah() {
@@ -145,3 +146,42 @@ document.getElementById("modalSiswa").addEventListener("click", function (e) {
 
 updateJumlah();
 tampilkanSiswa();
+
+
+function tampilkanAbsensi() {
+  const tbody = document.getElementById("tabelAbsensi");
+
+  tbody.innerHTML = "";
+
+  if (siswa.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="3" class="empty">
+          Belum ada data siswa
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  siswa.forEach(item => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${item.absen}</td>
+
+        <td>
+          <strong>${item.nama}</strong>
+        </td>
+
+        <td>
+          <select class="status-absensi">
+            <option value="Hadir">✅ Hadir</option>
+            <option value="Sakit">🤒 Sakit</option>
+            <option value="Izin">📄 Izin</option>
+            <option value="Alpa">❌ Alpa</option>
+          </select>
+        </td>
+      </tr>
+    `;
+  });
+}
