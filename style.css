@@ -10,3 +10,55 @@
 .mass-toolbar{display:grid;grid-template-columns:1fr 1.2fr 2fr auto auto;gap:10px;align-items:end}
 @media(max-width:1100px){.mass-toolbar{grid-template-columns:1fr 1fr}.mass-toolbar button{width:100%}}
 @media(max-width:650px){.mass-toolbar{grid-template-columns:1fr}}
+
+
+/* PEMULIHAN TAMPILAN HALAMAN AWAL & LOGIN */
+.landing,.auth-page{
+  min-height:100vh;
+  background:linear-gradient(135deg,#10243f,#24527f);
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
+.gate{
+  width:min(1080px,100%);
+  background:#fff;
+  border-radius:28px;
+  padding:54px;
+  box-shadow:0 30px 80px #0005;
+}
+.gate-brand{text-align:center;margin-bottom:40px}
+.big-logo,.auth-icon{font-size:48px}
+.gate h1,.auth-card h1{font-size:40px;margin:8px 0}
+.gate-options{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.role-card{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  text-decoration:none;
+  color:inherit;
+  border:1px solid #dfe7f0;
+  border-radius:20px;
+  padding:26px;
+  transition:.2s;
+}
+.role-card:hover{transform:translateY(-3px);box-shadow:0 14px 35px #1e4f8120}
+.role-card>span{font-size:42px}
+.role-card b{margin-left:auto;font-size:24px}
+.role-card p{color:#6d7b8e}
+.auth-card{
+  width:min(460px,100%);
+  background:#fff;
+  border-radius:24px;
+  padding:42px;
+  box-shadow:0 25px 70px #0005;
+}
+.back{color:#4e6075;text-decoration:none}
+.auth-icon{text-align:center;margin-top:25px}
+.auth-card .eyebrow,.auth-card h1,.auth-card>.muted{text-align:center}
+.auth-card label{display:block;font-weight:700;margin:18px 0 8px}
+.auth-card input{width:100%;padding:14px;border:1px solid #d6e0ea;border-radius:11px}
+.auth-card button{border:0;border-radius:11px;padding:13px 18px;background:#2468b2;color:#fff;font-weight:800;cursor:pointer}
+.error{color:#c62828;text-align:center}
+@media(max-width:850px){.gate-options{grid-template-columns:1fr 1fr}.gate{padding:30px}}
+@media(max-width:520px){.gate-options{grid-template-columns:1fr}.gate h1{font-size:32px}.role-card{padding:20px}}
