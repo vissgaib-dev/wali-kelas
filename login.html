@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Wali Kelas 5</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a, #1e3a5f);
+      padding: 20px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      border-radius: 20px;
+      padding: 40px 35px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 18px;
+      border-radius: 18px;
+      background: #2563eb;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0f172a;
+      font-size: 27px;
+      margin-bottom: 7px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      color: #334155;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 15px;
+      margin-bottom: 20px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    #pesan {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      margin-top: 25px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-box">
+
+    <div class="logo">📚</div>
+
+    <h1>Wali Kelas 5</h1>
+    <p class="subtitle">Aplikasi Administrasi Wali Kelas</p>
+
+    <form id="formLogin">
+
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Masukkan email"
+        required
+      >
+
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Masukkan password"
+        required
+      >
+
+      <button type="submit" id="tombolLogin">
+        Masuk
+      </button>
+
+      <div id="pesan"></div>
+
+    </form>
+
+    <div class="footer">
+      Administrasi Wali Kelas 5
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <script>
+    const formLogin = document.getElementById("formLogin");
+    const tombolLogin = document.getElementById("tombolLogin");
+    const pesan = document.getElementById("pesan");
+
+    formLogin.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      tombolLogin.disabled = true;
+      tombolLogin.textContent = "Memeriksa...";
+      pesan.textContent = "";
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        pesan.style.color = "#dc2626";
+        pesan.textContent = "Email atau password salah.";
+
+        tombolLogin.disabled = false;
+        tombolLogin.textContent = "Masuk";
+        return;
+      }
+
+      pesan.style.color = "#16a34a";
+      pesan.textContent = "Login berhasil...";
+
+      window.location.href = "index.html";
+    });
+  </script>
+
+</body>
+</html>
