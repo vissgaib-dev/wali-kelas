@@ -21,7 +21,7 @@
     <nav class="menu">
       <a class="active" data-page="dashboard">🏠 Dashboard</a>
       <a data-page="siswa">👨‍🎓 Data Siswa</a>
-      <a>📅 Absensi</a>
+      <a data-page="absensi">📅 Absensi</a>
       <a>📊 Rekap Kehadiran</a>
       <a>📖 Jurnal Mengajar</a>
       <a>📝 Catatan Siswa</a>
@@ -174,6 +174,59 @@
 
     </section>
 
+  <section id="absensi" class="page">
+
+  <div class="header">
+    <div>
+      <h1>Absensi Harian</h1>
+      <p>Catat kehadiran siswa Kelas 5</p>
+    </div>
+
+    <div class="profile">
+      📅 <strong id="tanggalHariIni">-</strong>
+    </div>
+  </div>
+
+  <div class="section">
+
+    <div class="toolbar">
+      <input id="tanggalAbsensi" class="search" type="date">
+
+      <button class="btn btn-primary">
+        ✅ Hadir Semua
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Nama Siswa</th>
+            <th>Status Kehadiran</th>
+          </tr>
+        </thead>
+
+        <tbody id="tabelAbsensi">
+          <tr>
+            <td colspan="3" class="empty">
+              Daftar siswa akan muncul di sini
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary">
+        💾 Simpan Absensi
+      </button>
+    </div>
+
+  </div>
+
+</section>
+  
   </main>
 
 
