@@ -3,331 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Wali Kelas 5</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <button class="mobile-toggle" id="mobileToggle">☰</button>
 
-  <aside class="sidebar">
-
+  <aside class="sidebar" id="sidebar">
     <div class="logo">
       <h2>🎓 WALI KELAS 5</h2>
       <p>Administrasi Kelas</p>
     </div>
-
     <nav class="menu">
       <a class="active" data-page="dashboard">🏠 Dashboard</a>
       <a data-page="siswa">👨‍🎓 Data Siswa</a>
       <a data-page="absensi">📅 Absensi</a>
-      <a>📊 Rekap Kehadiran</a>
-      <a>📖 Jurnal Mengajar</a>
-      <a>📝 Catatan Siswa</a>
-      <a>🏅 Nilai Siswa</a>
-      <a>🖨️ Cetak Laporan</a>
-      <a>⚙️ Pengaturan</a>
+      <a data-page="rekap">📊 Rekap Kehadiran</a>
+      <a data-page="jurnal">📖 Jurnal Mengajar</a>
+      <a data-page="catatan">📝 Catatan Siswa</a>
+      <a data-page="nilai">🏅 Nilai Siswa</a>
+      <a data-page="laporan">🖨️ Cetak Laporan</a>
+      <a data-page="pengaturan">⚙️ Pengaturan</a>
     </nav>
-
   </aside>
 
-
   <main class="main">
-
     <section id="dashboard" class="page active">
-
       <div class="header">
-
-        <div>
-          <h1>Dashboard Wali Kelas</h1>
-          <p>Selamat datang di aplikasi administrasi Kelas 5</p>
-        </div>
-
-        <div class="profile">
-          👨‍🏫 <strong>Wali Kelas 5</strong>
-        </div>
-
+        <div><h1>Dashboard Wali Kelas</h1><p id="subJudulDashboard">Selamat datang di aplikasi administrasi Kelas 5</p></div>
+        <div class="profile">👨‍🏫 <strong id="namaWaliHeader">Wali Kelas 5</strong></div>
       </div>
-
-
       <div class="cards">
-
-        <div class="card">
-          <div class="icon">👨‍🎓</div>
-          <h3 id="jumlahSiswa">0</h3>
-          <p>Jumlah Siswa</p>
-        </div>
-
-        <div class="card">
-          <div class="icon">✅</div>
-          <h3>0</h3>
-          <p>Hadir Hari Ini</p>
-        </div>
-
-        <div class="card">
-          <div class="icon">🤒</div>
-          <h3>0</h3>
-          <p>Sakit / Izin</p>
-        </div>
-
-        <div class="card">
-          <div class="icon">❌</div>
-          <h3>0</h3>
-          <p>Tanpa Keterangan</p>
-        </div>
-
+        <div class="card"><div class="icon">👨‍🎓</div><h3 id="jumlahSiswa">0</h3><p>Jumlah Siswa</p></div>
+        <div class="card"><div class="icon">✅</div><h3 id="hadirHariIni">0</h3><p>Hadir Hari Ini</p></div>
+        <div class="card"><div class="icon">🤒</div><h3 id="izinHariIni">0</h3><p>Sakit / Izin</p></div>
+        <div class="card"><div class="icon">❌</div><h3 id="alpaHariIni">0</h3><p>Tanpa Keterangan</p></div>
       </div>
-
-
       <div class="section">
-
         <h2>Akses Cepat</h2>
-
         <div class="quick-menu">
-
-          <button class="quick-button" onclick="bukaTambah()">
-            ➕<br><br>Tambah Siswa
-          </button>
-
-          <button class="quick-button">
-            📅<br><br>Isi Absensi
-          </button>
-
-          <button class="quick-button">
-            📖<br><br>Isi Jurnal
-          </button>
-
-          <button class="quick-button">
-            🖨️<br><br>Cetak Laporan
-          </button>
-
+          <button class="quick-button" onclick="bukaTambah()">➕<br><br>Tambah Siswa</button>
+          <button class="quick-button" onclick="bukaHalaman('absensi')">📅<br><br>Isi Absensi</button>
+          <button class="quick-button" onclick="bukaHalaman('jurnal')">📖<br><br>Isi Jurnal</button>
+          <button class="quick-button" onclick="bukaHalaman('laporan')">🖨️<br><br>Cetak Laporan</button>
         </div>
-
       </div>
-
     </section>
-
 
     <section id="siswa" class="page">
-
-      <div class="header">
-
-        <div>
-          <h1>Data Siswa</h1>
-          <p>Kelola data siswa Kelas 5</p>
-        </div>
-
-        <div class="profile">
-          👨‍🎓 <strong id="jumlahHeader">0 Siswa</strong>
-        </div>
-
-      </div>
-
-
+      <div class="header"><div><h1>Data Siswa</h1><p>Kelola data siswa Kelas 5</p></div><div class="profile">👨‍🎓 <strong id="jumlahHeader">0 Siswa</strong></div></div>
       <div class="section">
-
-        <div class="info-box">
-          🔒 Untuk tahap pengembangan, gunakan data percobaan dulu.
-          Jangan masukkan NISN atau data sensitif siswa asli.
-        </div>
-
-
+        <div class="info-box">🔒 Gunakan data percobaan selama pengembangan. Jangan masukkan NISN atau data sensitif siswa asli.</div>
         <div class="toolbar">
-
-          <input
-            id="cariSiswa"
-            class="search"
-            type="text"
-            placeholder="🔍 Cari nama siswa..."
-            oninput="tampilkanSiswa()"
-          >
-
-          <button class="btn btn-primary" onclick="bukaTambah()">
-            ➕ Tambah Siswa
-          </button>
-
+          <input id="cariSiswa" class="search" type="text" placeholder="🔍 Cari nama siswa...">
+          <button class="btn btn-primary" onclick="bukaTambah()">➕ Tambah Siswa</button>
         </div>
-
-
-        <div class="table-wrap">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Nama Siswa</th>
-                <th>Jenis Kelamin</th>
-                <th>No. Absen</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-
-            <tbody id="tabelSiswa"></tbody>
-
-          </table>
-
-        </div>
-
+        <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Siswa</th><th>Jenis Kelamin</th><th>No. Absen</th><th>Aksi</th></tr></thead><tbody id="tabelSiswa"></tbody></table></div>
       </div>
-
     </section>
 
-  <section id="absensi" class="page">
+    <section id="absensi" class="page">
+      <div class="header"><div><h1>Absensi Harian</h1><p>Catat kehadiran siswa Kelas 5</p></div><div class="profile">📅 <strong id="tanggalHariIni">-</strong></div></div>
+      <div class="section">
+        <div class="toolbar">
+          <input id="tanggalAbsensi" class="search" type="date">
+          <button class="btn btn-primary" onclick="hadirSemua()">✅ Hadir Semua</button>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Siswa</th><th>Status Kehadiran</th></tr></thead><tbody id="tabelAbsensi"></tbody></table></div>
+        <div class="actions-right"><button class="btn btn-primary" onclick="simpanAbsensi()">💾 Simpan Absensi</button></div>
+      </div>
+    </section>
 
-  <div class="header">
-    <div>
-      <h1>Absensi Harian</h1>
-      <p>Catat kehadiran siswa Kelas 5</p>
-    </div>
+    <section id="rekap" class="page">
+      <div class="header"><div><h1>Rekap Kehadiran</h1><p>Ringkasan kehadiran seluruh siswa</p></div></div>
+      <div class="section">
+        <div class="toolbar"><input id="bulanRekap" class="search" type="month"><button class="btn btn-secondary" onclick="tampilkanRekap()">🔄 Tampilkan</button></div>
+        <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama</th><th>Hadir</th><th>Sakit</th><th>Izin</th><th>Alpa</th><th>Total</th></tr></thead><tbody id="tabelRekap"></tbody></table></div>
+      </div>
+    </section>
 
-    <div class="profile">
-      📅 <strong id="tanggalHariIni">-</strong>
-    </div>
-  </div>
+    <section id="jurnal" class="page">
+      <div class="header"><div><h1>Jurnal Mengajar</h1><p>Catat kegiatan pembelajaran harian</p></div></div>
+      <div class="section">
+        <form id="formJurnal" class="form-grid">
+          <div class="form-group"><label>Tanggal</label><input id="jurnalTanggal" type="date" required></div>
+          <div class="form-group"><label>Mata Pelajaran</label><input id="jurnalMapel" type="text" required></div>
+          <div class="form-group full"><label>Materi / Kegiatan</label><textarea id="jurnalMateri" required></textarea></div>
+          <div class="form-group full"><button class="btn btn-primary" type="submit">💾 Simpan Jurnal</button></div>
+        </form>
+        <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Mapel</th><th>Materi / Kegiatan</th><th>Aksi</th></tr></thead><tbody id="tabelJurnal"></tbody></table></div>
+      </div>
+    </section>
 
-  <div class="section">
+    <section id="catatan" class="page">
+      <div class="header"><div><h1>Catatan Siswa</h1><p>Simpan catatan perkembangan dan kejadian penting</p></div></div>
+      <div class="section">
+        <form id="formCatatan" class="form-grid">
+          <div class="form-group"><label>Tanggal</label><input id="catatanTanggal" type="date" required></div>
+          <div class="form-group"><label>Siswa</label><select id="catatanSiswa" required></select></div>
+          <div class="form-group full"><label>Catatan</label><textarea id="isiCatatan" required></textarea></div>
+          <div class="form-group full"><button class="btn btn-primary" type="submit">💾 Simpan Catatan</button></div>
+        </form>
+        <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Siswa</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody id="tabelCatatan"></tbody></table></div>
+      </div>
+    </section>
 
-    <div class="toolbar">
-      <input id="tanggalAbsensi" class="search" type="date">
+    <section id="nilai" class="page">
+      <div class="header"><div><h1>Nilai Siswa</h1><p>Catat nilai berdasarkan mata pelajaran dan jenis penilaian</p></div></div>
+      <div class="section">
+        <form id="formNilai" class="form-grid">
+          <div class="form-group"><label>Siswa</label><select id="nilaiSiswa" required></select></div>
+          <div class="form-group"><label>Mata Pelajaran</label><input id="nilaiMapel" type="text" required></div>
+          <div class="form-group"><label>Jenis Penilaian</label><input id="nilaiJenis" type="text" placeholder="Contoh: UH 1" required></div>
+          <div class="form-group"><label>Nilai</label><input id="nilaiAngka" type="number" min="0" max="100" required></div>
+          <div class="form-group full"><button class="btn btn-primary" type="submit">💾 Simpan Nilai</button></div>
+        </form>
+        <div class="table-wrap"><table><thead><tr><th>Siswa</th><th>Mapel</th><th>Jenis</th><th>Nilai</th><th>Aksi</th></tr></thead><tbody id="tabelNilai"></tbody></table></div>
+      </div>
+    </section>
 
-      <button class="btn btn-primary">
-        ✅ Hadir Semua
-      </button>
-    </div>
+    <section id="laporan" class="page">
+      <div class="header"><div><h1>Cetak Laporan</h1><p>Cetak data administrasi yang dibutuhkan</p></div></div>
+      <div class="section">
+        <div class="report-grid">
+          <button class="report-card" onclick="cetakBagian('siswa')">👨‍🎓<strong>Data Siswa</strong><span>Cetak daftar siswa</span></button>
+          <button class="report-card" onclick="cetakBagian('rekap')">📊<strong>Rekap Kehadiran</strong><span>Cetak rekap bulan terpilih</span></button>
+          <button class="report-card" onclick="cetakBagian('jurnal')">📖<strong>Jurnal Mengajar</strong><span>Cetak jurnal pembelajaran</span></button>
+          <button class="report-card" onclick="cetakBagian('nilai')">🏅<strong>Nilai Siswa</strong><span>Cetak daftar nilai</span></button>
+        </div>
+      </div>
+    </section>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Nama Siswa</th>
-            <th>Status Kehadiran</th>
-          </tr>
-        </thead>
-
-        <tbody id="tabelAbsensi">
-          <tr>
-            <td colspan="3" class="empty">
-              Daftar siswa akan muncul di sini
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn btn-primary">
-        💾 Simpan Absensi
-      </button>
-    </div>
-
-  </div>
-
-</section>
-  
+    <section id="pengaturan" class="page">
+      <div class="header"><div><h1>Pengaturan</h1><p>Atur identitas kelas dan wali kelas</p></div></div>
+      <div class="section">
+        <form id="formPengaturan" class="form-grid">
+          <div class="form-group"><label>Nama Wali Kelas</label><input id="settingWali" type="text"></div>
+          <div class="form-group"><label>Nama Kelas</label><input id="settingKelas" type="text"></div>
+          <div class="form-group"><label>Nama Sekolah</label><input id="settingSekolah" type="text"></div>
+          <div class="form-group"><label>Tahun Pelajaran</label><input id="settingTahun" type="text" placeholder="2026/2027"></div>
+          <div class="form-group full"><button class="btn btn-primary" type="submit">💾 Simpan Pengaturan</button></div>
+        </form>
+        <div class="danger-zone"><h3>Cadangan Data</h3><p>Unduh cadangan sebelum mengganti HP/browser atau menghapus data browser.</p><div class="toolbar"><button class="btn btn-secondary" onclick="eksporData()">⬇️ Ekspor Data</button><label class="btn btn-secondary file-label">⬆️ Impor Data<input id="fileImpor" type="file" accept=".json"></label></div></div>
+      </div>
+    </section>
   </main>
 
-
   <div id="modalSiswa" class="modal">
-
     <div class="modal-box">
-
-      <div class="modal-head">
-
-        <h2 id="judulModal">Tambah Siswa</h2>
-
-        <button class="close" onclick="tutupModal()">
-          ×
-        </button>
-
-      </div>
-
-
+      <div class="modal-head"><h2 id="judulModal">Tambah Siswa</h2><button class="close" onclick="tutupModal()">×</button></div>
       <form id="formSiswa">
-
         <div class="form-grid">
-
-          <div class="form-group full">
-
-            <label>Nama Siswa</label>
-
-            <input
-              id="nama"
-              type="text"
-              placeholder="Masukkan nama siswa"
-              required
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>Jenis Kelamin</label>
-
-            <select id="jk" required>
-
-              <option value="">Pilih</option>
-
-              <option value="Laki-laki">
-                Laki-laki
-              </option>
-
-              <option value="Perempuan">
-                Perempuan
-              </option>
-
-            </select>
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>Nomor Absen</label>
-
-            <input
-              id="absen"
-              type="number"
-              min="1"
-              placeholder="Contoh: 1"
-              required
-            >
-
-          </div>
-
+          <div class="form-group full"><label>Nama Siswa</label><input id="nama" type="text" required></div>
+          <div class="form-group"><label>Jenis Kelamin</label><select id="jk" required><option value="">Pilih</option><option>Laki-laki</option><option>Perempuan</option></select></div>
+          <div class="form-group"><label>Nomor Absen</label><input id="absen" type="number" min="1" required></div>
         </div>
-
-
-        <div class="modal-actions">
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="tutupModal()"
-          >
-            Batal
-          </button>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-          >
-            💾 Simpan
-          </button>
-
-        </div>
-
+        <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="tutupModal()">Batal</button><button type="submit" class="btn btn-primary">💾 Simpan</button></div>
       </form>
-
     </div>
-
   </div>
 
-
+  <div id="toast" class="toast"></div>
   <script src="app.js"></script>
-
 </body>
 </html>
