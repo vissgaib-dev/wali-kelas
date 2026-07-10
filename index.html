@@ -1,446 +1,280 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wali Kelas 5</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
-body{background:#f4f7fb;color:#172033}
-button,input,select{font:inherit}
-button{cursor:pointer}
+  <title>Wali Kelas 5</title>
 
-.sidebar{
-position:fixed;left:0;top:0;width:250px;height:100vh;
-background:#174477;color:white;padding:25px 18px;overflow-y:auto
-}
-.logo{text-align:center;margin-bottom:30px}
-.logo h2{font-size:22px}
-.logo p{margin-top:7px;font-size:13px;opacity:.8}
-
-.menu a{
-display:block;color:white;text-decoration:none;padding:14px;
-margin-bottom:7px;border-radius:10px;cursor:pointer
-}
-.menu a:hover,.menu a.active{background:rgba(255,255,255,.16)}
-
-.main{margin-left:250px;padding:30px;min-height:100vh}
-
-.header{
-display:flex;justify-content:space-between;align-items:center;
-margin-bottom:30px
-}
-.header h1{font-size:28px}
-.header p{margin-top:6px;color:#6b7280}
-.profile{
-background:white;padding:13px 18px;border-radius:12px;
-box-shadow:0 4px 18px rgba(0,0,0,.06)
-}
-
-.page{display:none}
-.page.active{display:block}
-
-.cards{
-display:grid;grid-template-columns:repeat(4,1fr);gap:20px
-}
-.card,.section{
-background:white;border-radius:16px;
-box-shadow:0 4px 18px rgba(0,0,0,.06)
-}
-.card{padding:22px}
-.card .icon{font-size:30px;margin-bottom:15px}
-.card h3{font-size:30px;margin-bottom:5px}
-.card p{color:#6b7280}
-
-.section{margin-top:25px;padding:25px}
-.section h2{margin-bottom:20px}
-
-.quick-menu{
-display:grid;grid-template-columns:repeat(4,1fr);gap:15px
-}
-.quick-button{
-border:0;background:#eef4fb;padding:20px 10px;
-border-radius:12px;font-size:15px
-}
-.quick-button:hover{background:#dbeafe}
-
-.toolbar{
-display:flex;justify-content:space-between;gap:15px;
-align-items:center;margin-bottom:20px
-}
-.search{
-width:100%;max-width:420px;padding:12px 15px;
-border:1px solid #d5dbe5;border-radius:10px;outline:none
-}
-.btn{
-border:0;border-radius:10px;padding:12px 16px;font-weight:bold
-}
-.btn-primary{background:#174477;color:white}
-.btn-secondary{background:#e8eef6;color:#174477}
-.btn-danger{background:#fee2e2;color:#b91c1c}
-.btn-small{padding:7px 10px;font-size:13px}
-
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th,td{
-padding:13px 12px;border-bottom:1px solid #e5e7eb;
-text-align:left;white-space:nowrap
-}
-th{background:#f7f9fc;color:#475569;font-size:14px}
-.empty{text-align:center!important;color:#6b7280;padding:35px!important}
-
-.modal{
-display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
-align-items:center;justify-content:center;padding:20px;z-index:100
-}
-.modal.active{display:flex}
-.modal-box{
-background:white;width:100%;max-width:620px;border-radius:18px;
-padding:25px;max-height:90vh;overflow-y:auto
-}
-.modal-head{
-display:flex;justify-content:space-between;align-items:center;
-margin-bottom:22px
-}
-.close{
-border:0;background:#eef2f7;width:36px;height:36px;
-border-radius:50%;font-size:20px
-}
-.form-grid{
-display:grid;grid-template-columns:1fr 1fr;gap:16px
-}
-.form-group{display:flex;flex-direction:column;gap:7px}
-.form-group.full{grid-column:1/-1}
-.form-group label{font-size:14px;font-weight:bold;color:#475569}
-.form-group input,.form-group select{
-padding:12px;border:1px solid #d5dbe5;border-radius:9px;outline:none
-}
-.modal-actions{
-display:flex;justify-content:flex-end;gap:10px;margin-top:22px
-}
-
-.info-box{
-background:#eef6ff;color:#174477;padding:14px 16px;
-border-radius:10px;margin-bottom:20px;font-size:14px
-}
-
-@media(max-width:900px){
-.cards{grid-template-columns:repeat(2,1fr)}
-.quick-menu{grid-template-columns:repeat(2,1fr)}
-}
-
-@media(max-width:700px){
-.sidebar{position:relative;width:100%;height:auto}
-.main{margin-left:0;padding:18px}
-.header{display:block}
-.profile{margin-top:15px}
-.cards{grid-template-columns:1fr 1fr;gap:12px}
-.toolbar{flex-direction:column;align-items:stretch}
-.search{max-width:none}
-.form-grid{grid-template-columns:1fr}
-.form-group.full{grid-column:auto}
-}
-</style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<aside class="sidebar">
-<div class="logo">
-<h2>🎓 WALI KELAS 5</h2>
-<p>Administrasi Kelas</p>
-</div>
+  <aside class="sidebar">
 
-<nav class="menu">
-<a class="active" data-page="dashboard">🏠 Dashboard</a>
-<a data-page="siswa">👨‍🎓 Data Siswa</a>
-<a>📅 Absensi</a>
-<a>📊 Rekap Kehadiran</a>
-<a>📖 Jurnal Mengajar</a>
-<a>📝 Catatan Siswa</a>
-<a>🏅 Nilai Siswa</a>
-<a>🖨️ Cetak Laporan</a>
-<a>⚙️ Pengaturan</a>
-</nav>
-</aside>
+    <div class="logo">
+      <h2>🎓 WALI KELAS 5</h2>
+      <p>Administrasi Kelas</p>
+    </div>
 
-<main class="main">
+    <nav class="menu">
+      <a class="active" data-page="dashboard">🏠 Dashboard</a>
+      <a data-page="siswa">👨‍🎓 Data Siswa</a>
+      <a>📅 Absensi</a>
+      <a>📊 Rekap Kehadiran</a>
+      <a>📖 Jurnal Mengajar</a>
+      <a>📝 Catatan Siswa</a>
+      <a>🏅 Nilai Siswa</a>
+      <a>🖨️ Cetak Laporan</a>
+      <a>⚙️ Pengaturan</a>
+    </nav>
 
-<section id="dashboard" class="page active">
+  </aside>
 
-<div class="header">
-<div>
-<h1>Dashboard Wali Kelas</h1>
-<p>Selamat datang di aplikasi administrasi Kelas 5</p>
-</div>
-<div class="profile">👨‍🏫 <strong>Wali Kelas 5</strong></div>
-</div>
 
-<div class="cards">
-<div class="card">
-<div class="icon">👨‍🎓</div>
-<h3 id="jumlahSiswa">0</h3>
-<p>Jumlah Siswa</p>
-</div>
+  <main class="main">
 
-<div class="card">
-<div class="icon">✅</div>
-<h3>0</h3>
-<p>Hadir Hari Ini</p>
-</div>
+    <section id="dashboard" class="page active">
 
-<div class="card">
-<div class="icon">🤒</div>
-<h3>0</h3>
-<p>Sakit / Izin</p>
-</div>
+      <div class="header">
 
-<div class="card">
-<div class="icon">❌</div>
-<h3>0</h3>
-<p>Tanpa Keterangan</p>
-</div>
-</div>
+        <div>
+          <h1>Dashboard Wali Kelas</h1>
+          <p>Selamat datang di aplikasi administrasi Kelas 5</p>
+        </div>
 
-<div class="section">
-<h2>Akses Cepat</h2>
-<div class="quick-menu">
-<button class="quick-button" onclick="bukaTambah()">➕<br><br>Tambah Siswa</button>
-<button class="quick-button">📅<br><br>Isi Absensi</button>
-<button class="quick-button">📖<br><br>Isi Jurnal</button>
-<button class="quick-button">🖨️<br><br>Cetak Laporan</button>
-</div>
-</div>
+        <div class="profile">
+          👨‍🏫 <strong>Wali Kelas 5</strong>
+        </div>
 
-</section>
+      </div>
 
-<section id="siswa" class="page">
 
-<div class="header">
-<div>
-<h1>Data Siswa</h1>
-<p>Kelola data siswa Kelas 5</p>
-</div>
-<div class="profile">👨‍🎓 <strong id="jumlahHeader">0 Siswa</strong></div>
-</div>
+      <div class="cards">
 
-<div class="section">
+        <div class="card">
+          <div class="icon">👨‍🎓</div>
+          <h3 id="jumlahSiswa">0</h3>
+          <p>Jumlah Siswa</p>
+        </div>
 
-<div class="info-box">
-🔒 Untuk tahap pengembangan, gunakan data percobaan dulu. Jangan masukkan NISN atau data sensitif siswa asli.
-</div>
+        <div class="card">
+          <div class="icon">✅</div>
+          <h3>0</h3>
+          <p>Hadir Hari Ini</p>
+        </div>
 
-<div class="toolbar">
-<input id="cariSiswa" class="search" type="text"
-placeholder="🔍 Cari nama siswa..." oninput="tampilkanSiswa()">
+        <div class="card">
+          <div class="icon">🤒</div>
+          <h3>0</h3>
+          <p>Sakit / Izin</p>
+        </div>
 
-<button class="btn btn-primary" onclick="bukaTambah()">
-➕ Tambah Siswa
-</button>
-</div>
+        <div class="card">
+          <div class="icon">❌</div>
+          <h3>0</h3>
+          <p>Tanpa Keterangan</p>
+        </div>
 
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>No.</th>
-<th>Nama Siswa</th>
-<th>Jenis Kelamin</th>
-<th>No. Absen</th>
-<th>Aksi</th>
-</tr>
-</thead>
-<tbody id="tabelSiswa"></tbody>
-</table>
-</div>
+      </div>
 
-</div>
-</section>
 
-</main>
+      <div class="section">
 
-<div id="modalSiswa" class="modal">
-<div class="modal-box">
+        <h2>Akses Cepat</h2>
 
-<div class="modal-head">
-<h2 id="judulModal">Tambah Siswa</h2>
-<button class="close" onclick="tutupModal()">×</button>
-</div>
+        <div class="quick-menu">
 
-<form id="formSiswa">
+          <button class="quick-button" onclick="bukaTambah()">
+            ➕<br><br>Tambah Siswa
+          </button>
 
-<div class="form-grid">
+          <button class="quick-button">
+            📅<br><br>Isi Absensi
+          </button>
 
-<div class="form-group full">
-<label>Nama Siswa</label>
-<input id="nama" type="text" placeholder="Masukkan nama siswa" required>
-</div>
+          <button class="quick-button">
+            📖<br><br>Isi Jurnal
+          </button>
 
-<div class="form-group">
-<label>Jenis Kelamin</label>
-<select id="jk" required>
-<option value="">Pilih</option>
-<option value="Laki-laki">Laki-laki</option>
-<option value="Perempuan">Perempuan</option>
-</select>
-</div>
+          <button class="quick-button">
+            🖨️<br><br>Cetak Laporan
+          </button>
 
-<div class="form-group">
-<label>Nomor Absen</label>
-<input id="absen" type="number" min="1" placeholder="Contoh: 1" required>
-</div>
+        </div>
 
-</div>
+      </div>
 
-<div class="modal-actions">
-<button type="button" class="btn btn-secondary" onclick="tutupModal()">
-Batal
-</button>
-<button type="submit" class="btn btn-primary">
-💾 Simpan
-</button>
-</div>
+    </section>
 
-</form>
-</div>
-</div>
 
-<script>
-let siswa = JSON.parse(localStorage.getItem("dataSiswaKelas5")) || [];
-let editIndex = null;
+    <section id="siswa" class="page">
 
-const menuItems = document.querySelectorAll(".menu a[data-page]");
+      <div class="header">
 
-menuItems.forEach(menu => {
-menu.addEventListener("click", function(){
-bukaHalaman(this.dataset.page);
-});
-});
+        <div>
+          <h1>Data Siswa</h1>
+          <p>Kelola data siswa Kelas 5</p>
+        </div>
 
-function bukaHalaman(id){
-document.querySelectorAll(".page").forEach(page=>{
-page.classList.remove("active");
-});
+        <div class="profile">
+          👨‍🎓 <strong id="jumlahHeader">0 Siswa</strong>
+        </div>
 
-document.getElementById(id).classList.add("active");
+      </div>
 
-menuItems.forEach(menu=>{
-menu.classList.toggle("active", menu.dataset.page === id);
-});
 
-if(id === "siswa") tampilkanSiswa();
-}
+      <div class="section">
 
-function bukaTambah(){
-editIndex = null;
-document.getElementById("judulModal").textContent = "Tambah Siswa";
-document.getElementById("formSiswa").reset();
-document.getElementById("modalSiswa").classList.add("active");
-}
+        <div class="info-box">
+          🔒 Untuk tahap pengembangan, gunakan data percobaan dulu.
+          Jangan masukkan NISN atau data sensitif siswa asli.
+        </div>
 
-function tutupModal(){
-document.getElementById("modalSiswa").classList.remove("active");
-}
 
-document.getElementById("formSiswa").addEventListener("submit", function(e){
-e.preventDefault();
+        <div class="toolbar">
 
-const data = {
-nama: document.getElementById("nama").value.trim(),
-jk: document.getElementById("jk").value,
-absen: Number(document.getElementById("absen").value)
-};
+          <input
+            id="cariSiswa"
+            class="search"
+            type="text"
+            placeholder="🔍 Cari nama siswa..."
+            oninput="tampilkanSiswa()"
+          >
 
-if(editIndex === null){
-siswa.push(data);
-}else{
-siswa[editIndex] = data;
-}
+          <button class="btn btn-primary" onclick="bukaTambah()">
+            ➕ Tambah Siswa
+          </button>
 
-siswa.sort((a,b)=>a.absen-b.absen);
-simpanData();
-tutupModal();
-tampilkanSiswa();
-});
+        </div>
 
-function tampilkanSiswa(){
-const tbody = document.getElementById("tabelSiswa");
-const kata = document.getElementById("cariSiswa").value.toLowerCase();
 
-tbody.innerHTML = "";
+        <div class="table-wrap">
 
-const hasil = siswa.filter(item =>
-item.nama.toLowerCase().includes(kata)
-);
+          <table>
 
-if(hasil.length === 0){
-tbody.innerHTML = `
-<tr>
-<td colspan="5" class="empty">
-Belum ada data siswa
-</td>
-</tr>`;
-}else{
-hasil.forEach(item=>{
-const indexAsli = siswa.indexOf(item);
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Nama Siswa</th>
+                <th>Jenis Kelamin</th>
+                <th>No. Absen</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
 
-tbody.innerHTML += `
-<tr>
-<td>${item.absen}</td>
-<td><strong>${item.nama}</strong></td>
-<td>${item.jk}</td>
-<td>${item.absen}</td>
-<td>
-<button class="btn btn-secondary btn-small"
-onclick="editSiswa(${indexAsli})">✏️ Edit</button>
+            <tbody id="tabelSiswa"></tbody>
 
-<button class="btn btn-danger btn-small"
-onclick="hapusSiswa(${indexAsli})">🗑️ Hapus</button>
-</td>
-</tr>`;
-});
-}
+          </table>
 
-updateJumlah();
-}
+        </div>
 
-function editSiswa(index){
-editIndex = index;
+      </div>
 
-document.getElementById("judulModal").textContent = "Edit Siswa";
-document.getElementById("nama").value = siswa[index].nama;
-document.getElementById("jk").value = siswa[index].jk;
-document.getElementById("absen").value = siswa[index].absen;
+    </section>
 
-document.getElementById("modalSiswa").classList.add("active");
-}
+  </main>
 
-function hapusSiswa(index){
-if(confirm("Hapus data " + siswa[index].nama + "?")){
-siswa.splice(index,1);
-simpanData();
-tampilkanSiswa();
-}
-}
 
-function simpanData(){
-localStorage.setItem("dataSiswaKelas5", JSON.stringify(siswa));
-updateJumlah();
-}
+  <div id="modalSiswa" class="modal">
 
-function updateJumlah(){
-document.getElementById("jumlahSiswa").textContent = siswa.length;
-document.getElementById("jumlahHeader").textContent = siswa.length + " Siswa";
-}
+    <div class="modal-box">
 
-document.getElementById("modalSiswa").addEventListener("click", function(e){
-if(e.target === this) tutupModal();
-});
+      <div class="modal-head">
 
-updateJumlah();
-tampilkanSiswa();
-</script>
+        <h2 id="judulModal">Tambah Siswa</h2>
+
+        <button class="close" onclick="tutupModal()">
+          ×
+        </button>
+
+      </div>
+
+
+      <form id="formSiswa">
+
+        <div class="form-grid">
+
+          <div class="form-group full">
+
+            <label>Nama Siswa</label>
+
+            <input
+              id="nama"
+              type="text"
+              placeholder="Masukkan nama siswa"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>Jenis Kelamin</label>
+
+            <select id="jk" required>
+
+              <option value="">Pilih</option>
+
+              <option value="Laki-laki">
+                Laki-laki
+              </option>
+
+              <option value="Perempuan">
+                Perempuan
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>Nomor Absen</label>
+
+            <input
+              id="absen"
+              type="number"
+              min="1"
+              placeholder="Contoh: 1"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="tutupModal()"
+          >
+            Batal
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >
+            💾 Simpan
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <script src="app.js"></script>
 
 </body>
 </html>
