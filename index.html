@@ -260,6 +260,9 @@
 
 <div id="modalSiswa" class="modal"><div class="modal-box"><div class="modal-head"><h2 id="judulModal">Tambah Siswa</h2><button onclick="tutupModal()">×</button></div><form id="formSiswa" class="form-grid"><label class="full">Nama Siswa<input id="nama" required></label><label>Jenis Kelamin<select id="jk" required><option value="">Pilih</option><option>Laki-laki</option><option>Perempuan</option></select></label><label>Nomor Absen<input id="absen" type="number" min="1" required></label><label class="full">Kode Kartu / QR<input id="kodeKartu" placeholder="Otomatis jika dikosongkan"></label><div class="full actions"><button type="button" class="btn secondary" onclick="tutupModal()">Batal</button><button class="btn primary">💾 Simpan</button></div></form></div></div>
 <div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="app.js"></script>
+
 </body>
 </html>
